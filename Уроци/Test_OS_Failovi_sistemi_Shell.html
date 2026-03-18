@@ -699,7 +699,7 @@ function finishQuiz(cheated) {
   if (cheated) {
     show('screen-cheat');
     document.getElementById('cheat-score').textContent =
-      `Отговорени: ${totalAnswered} / ${shuffled.length} | Верни: ${correct} | Оценка: ${grade}`;
+      `Оценка: ${grade}`;
     document.getElementById('cheat-send').innerHTML =
       `<div style="font-size:.85rem;color:#666;margin-bottom:8px">Изпрати резултата до учителя:</div>`;
   } else {
@@ -708,13 +708,15 @@ function finishQuiz(cheated) {
     const circ = document.getElementById('score-circle');
     circ.style.borderColor = grade >= 5 ? 'var(--green)' : grade === 4 ? 'var(--blue)' : 'var(--red)';
     circ.style.color       = grade >= 5 ? 'var(--green)' : grade === 4 ? 'var(--blue)' : 'var(--red)';
-    document.getElementById('score-num').textContent = `${correct}/${shuffled.length}`;
-    document.getElementById('score-label').textContent = `${pct}%`;
+    document.getElementById('score-num').textContent = grade;
+    document.getElementById('score-label').textContent = 'Оценка';
     document.getElementById('result-info').innerHTML =
-      `<p>🎓 <strong>Ученик:</strong> ${studentName} (${studentClass})</p>
-       <p>✅ <strong>Верни отговори:</strong> ${correct} от ${shuffled.length}</p>
-       <p>📊 <strong>Оценка:</strong> ${grade}</p>
-       <p>⏱ <strong>Времетраене:</strong> ${fmtTime(elapsed)}</p>`;
+      `<p style="text-align:center;font-size:1rem;color:#555">
+         ${studentName} · ${studentClass}
+       </p>
+       <p style="text-align:center;margin-top:8px;font-size:.9rem;color:#888">
+         Времетраене: ${fmtTime(elapsed)}
+       </p>`;
   }
 
   submitResult(correct, totalAnswered, elapsed, grade, cheated);
