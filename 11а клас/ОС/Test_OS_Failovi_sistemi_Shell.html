@@ -738,25 +738,7 @@ function fmtTime(sec) {
 
 // ── Изпращане чрез Formspree ──────────────────────────────────────────────
 function submitResult(correct, answered, elapsed, grade, cheated) {
-  const total = shuffled.length;
-  const pct   = Math.round(correct / total * 100);
-
-  const details = answers.map((a, i) => {
-    const q     = shuffled[i];
-    const given = q.opts[a.given] || '—';
-    const right = q.opts[q.c];
-    return `${i+1}. [${a.correct ? '✓' : '✗'}] ${q.q} → ${given}${a.correct ? '' : ' (Верен: ' + right + ')'}`;
-  }).join('\n');
-
-  const payload = {
-    Ученик:      studentName,
-    Клас:        studentClass,
-    Верни:       `${correct} / ${total} (${pct}%)`,
-    Оценка:      grade,
-    Времетраене: fmtTime(elapsed),
-    Нарушение:   cheated ? 'ДА — напусна прозореца!' : 'НЕ',
-    Детайли:     details,
-  };
+  const payload = buildPayload(cheated ? 'ДА — напусна прозореца!' : 'НЕ');
 
   const setStatus = (html, cls) => {
     const t = cheated
@@ -784,6 +766,51 @@ function submitResult(correct, answered, elapsed, grade, cheated) {
     setStatus('⚠️ Няма интернет връзка — покажи екрана на учителя.', 'status-msg status-err');
   });
 }
+
+// ── sendBeacon — изпращане при затваряне на браузъра ─────────────────────
+function buildPayload(reason) {
+  const total   = shuffled.length;
+  const correct = answers.filter(a => a.correct).length;
+  const answered = answers.length;
+  const elapsed  = Math.round((Date.now() - startTime) / 1000);
+  const grade    = calcGrade(correct, total);
+  const pct      = Math.round(correct / total * 100);
+
+  const details = answers.map((a, i) => {
+    const q     = shuffled[i];
+    const given = q.opts[a.given] || '—';
+    const right = q.opts[q.c];
+    return `${i+1}. [${a.correct ? '✓' : '✗'}] ${q.q} → ${given}${a.correct ? '' : ' (Верен: ' + right + ')'}`;
+  }).join('\n');
+
+  return {
+    Ученик:      studentName  || '(неизвестен)',
+    Клас:        studentClass || '—',
+    Верни:       `${correct} / ${total} (${pct}%)`,
+    Оценка:      grade,
+    Времетраене: fmtTime(elapsed),
+    Нарушение:   reason,
+    Отговорени:  `${answered} / ${total}`,
+    Детайли:     details,
+  };
+}
+
+function sendBeaconResult(reason) {
+  if (!startTime || answers.length === 0) return;
+  const payload = buildPayload(reason);
+  // sendBeacon изисква URLSearchParams или Blob — не JSON
+  const params = new URLSearchParams();
+  Object.entries(payload).forEach(([k, v]) => params.append(k, v));
+  const blob = new Blob([params.toString()], { type: 'application/x-www-form-urlencoded' });
+  navigator.sendBeacon(FORMSPREE, blob);
+}
+
+// beforeunload — затваряне на браузъра / таб / навигация
+window.addEventListener('beforeunload', function() {
+  if (!quizDone && answers.length > 0) {
+    sendBeaconResult('ДА — затвори браузъра/таб без да предаде');
+  }
+});
 
 // ── Детекция на смяна на таб / прозорец ───────────────────────────────────
 function enableTabDetection() {
