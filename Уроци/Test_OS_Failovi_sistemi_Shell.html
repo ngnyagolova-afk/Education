@@ -771,23 +771,35 @@ ${details}`
 
   const mailLink = `mailto:${TEACHER_EMAIL}?subject=${subject}&body=${body}`;
 
-  // Показваме бутон за изпращане
-  const el = document.getElementById('status-msg');
-  if (el) {
-    el.innerHTML = `
-      <div style="margin-bottom:10px;color:#555;font-size:.9rem">
-        Натисни бутона — ще се отвори имейл клиентът с попълнени резултати.
-      </div>
-      <a href="${mailLink}"
-         style="display:inline-block;background:#2E7D32;color:#fff;
-                padding:12px 28px;border-radius:10px;font-weight:700;
-                font-size:1rem;text-decoration:none;border:none;cursor:pointer"
-         onclick="this.textContent='✅ Имейлът е готов!';this.style.background='#1565C0'">
-        📧 Изпрати резултата до учителя
-      </a>`;
-    el.className = 'status-msg';
-    el.style.background = 'transparent';
+  const btnHTML = `
+    <div style="margin-bottom:10px;color:#555;font-size:.92rem;font-weight:600">
+      ⚠️ Задължително: натисни бутона и изпрати имейла!
+    </div>
+    <a href="${mailLink}" id="mail-btn"
+       style="display:inline-block;background:#2E7D32;color:#fff;
+              padding:14px 32px;border-radius:12px;font-weight:700;
+              font-size:1.05rem;text-decoration:none;cursor:pointer;
+              box-shadow:0 3px 10px rgba(0,0,0,.2)"
+       onclick="document.getElementById('mail-btn').textContent='✅ Имейлът е отворен — натисни Изпрати!';
+                document.getElementById('mail-btn').style.background='#1565C0';">
+      📧 Изпрати резултата до учителя
+    </a>
+    <div style="margin-top:10px;font-size:.8rem;color:#999">
+      Ще се отвори Gmail / Outlook — натисни "Изпрати" там.
+    </div>`;
+
+  // Поставяме бутона на правилния екран (резултат или нарушение)
+  const target = cheated
+    ? document.getElementById('cheat-send')
+    : document.getElementById('status-msg');
+  if (target) {
+    target.innerHTML = btnHTML;
+    target.style.background = 'transparent';
+    target.className = '';
   }
+
+  // Автоматично отваряме mailto след 600ms (след като екранът се е зареди)
+  setTimeout(() => window.location.href = mailLink, 600);
 }
 
 // ── Детекция на смяна на таб / прозорец ───────────────────────────────────
