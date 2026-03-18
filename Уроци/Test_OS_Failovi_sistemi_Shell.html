@@ -233,7 +233,17 @@
 
 <script>
 // ── Данни ─────────────────────────────────────────────────────────────────
-const FORMSPREE = 'https://formspree.io/f/xwvrapnk';
+const GF_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeOtO5l32B_gjOT-teKRVOdHwH3qYSThvwHRPP4puzkcoIGWw/formResponse';
+const GF = {
+  Ученик:      'entry.846304712',
+  Клас:        'entry.1675358834',
+  Верни:       'entry.256789767',
+  Оценка:      'entry.945780811',
+  Времетраене: 'entry.883004936',
+  Нарушение:   'entry.1355958976',
+  Отговорени:  'entry.1055391325',
+  Детайли:     'entry.1413354067',
+};
 
 const QUESTIONS = [
   {
@@ -749,18 +759,15 @@ function submitResult(correct, answered, elapsed, grade, cheated) {
 
   setStatus('<span style="color:#888;font-size:.9rem">⏳ Изпращане...</span>', '');
 
-  fetch(FORMSPREE, {
-    method:  'POST',
-    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-    body:    JSON.stringify(payload),
+  // Google Forms не връща CORS хедъри — използваме no-cors; данните се изпращат успешно
+  fetch(GF_URL, {
+    method: 'POST',
+    mode:   'no-cors',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body:   buildFormParams(cheated ? 'ДА — напусна прозореца!' : 'НЕ').toString(),
   })
-  .then(r => r.json())
-  .then(d => {
-    if (d.ok) {
-      setStatus('✅ Резултатът е изпратен до учителя!', 'status-msg status-ok');
-    } else {
-      setStatus('⚠️ Грешка при изпращане — покажи екрана на учителя.', 'status-msg status-err');
-    }
+  .then(() => {
+    setStatus('✅ Резултатът е изпратен до учителя!', 'status-msg status-ok');
   })
   .catch(() => {
     setStatus('⚠️ Няма интернет връзка — покажи екрана на учителя.', 'status-msg status-err');
@@ -795,14 +802,18 @@ function buildPayload(reason) {
   };
 }
 
+function buildFormParams(reason) {
+  const p = buildPayload(reason);
+  const params = new URLSearchParams();
+  Object.entries(GF).forEach(([key, entry]) => params.append(entry, p[key] ?? ''));
+  return params;
+}
+
 function sendBeaconResult(reason) {
   if (!startTime || answers.length === 0) return;
-  const payload = buildPayload(reason);
-  // sendBeacon изисква URLSearchParams или Blob — не JSON
-  const params = new URLSearchParams();
-  Object.entries(payload).forEach(([k, v]) => params.append(k, v));
-  const blob = new Blob([params.toString()], { type: 'application/x-www-form-urlencoded' });
-  navigator.sendBeacon(FORMSPREE, blob);
+  const blob = new Blob([buildFormParams(reason).toString()],
+    { type: 'application/x-www-form-urlencoded' });
+  navigator.sendBeacon(GF_URL, blob);
 }
 
 // beforeunload — затваряне на браузъра / таб / навигация
