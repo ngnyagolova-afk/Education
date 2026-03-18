@@ -724,6 +724,8 @@ function buildFormParams(reason) {{
   const p = buildPayload(reason);
   const params = new URLSearchParams();
   params.append('fvv', '1');
+  params.append('fbzx', Math.floor(Math.random() * 9e15).toString());
+  params.append('pageHistory', '0');
   Object.entries(GF).forEach(([key, entry]) => params.append(entry, p[key] ?? ''));
   return params;
 }}
