@@ -1,146 +1,395 @@
-<!DOCTYPE html>
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
+from pathlib import Path
+
+OUT = Path(r'C:\Users\Neli Nqgolova\Documents\Education\Уроци\Test_OS_Failovi_sistemi_Shell.html')
+
+QUESTIONS = [
+    # ── РАЗДЕЛ 6: ФАЙЛОВИ СИСТЕМИ ──────────────────────────────────────────
+    {
+        "q": "Какво представлява файловата система?",
+        "opts": [
+            "Физическо устройство за съхранение на данни",
+            "Механизъм, контролиращ организацията, достъпа и съхранението на данни",
+            "Програма за управление на процеси",
+            "Протокол за мрежова комуникация"
+        ],
+        "c": 1,
+        "topic": "Раздел 6"
+    },
+    {
+        "q": "На колко байта е стандартният размер на един сектор на твърдия диск?",
+        "opts": ["256 байта", "4096 байта", "1024 байта", "512 байта"],
+        "c": 3,
+        "topic": "Раздел 6"
+    },
+    {
+        "q": "Файловата система ext4 е характерна предимно за:",
+        "opts": ["Windows", "macOS", "Linux", "FreeBSD"],
+        "c": 2,
+        "topic": "Раздел 6"
+    },
+    {
+        "q": "Каква е максималната дискова памет, поддържана от MBR?",
+        "opts": ["512 GB", "4 TB", "8 ZB", "2 TB"],
+        "c": 3,
+        "topic": "Раздел 6"
+    },
+    {
+        "q": "Колко първични дяла (primary partitions) поддържа MBR схемата?",
+        "opts": ["2", "8", "128", "4"],
+        "c": 3,
+        "topic": "Раздел 6"
+    },
+    {
+        "q": "GPT (GUID Partition Table) поддържа до колко дяла?",
+        "opts": ["4", "32", "128", "64"],
+        "c": 2,
+        "topic": "Раздел 6"
+    },
+    {
+        "q": "Коя команда в Linux монтира файлова система?",
+        "opts": ["lsblk", "fsck", "fdisk", "mount"],
+        "c": 3,
+        "topic": "Раздел 6"
+    },
+    {
+        "q": "Коя команда демонтира (unmount) файлова система в Linux?",
+        "opts": ["dismount", "detach", "unmount", "umount"],
+        "c": 3,
+        "topic": "Раздел 6"
+    },
+    {
+        "q": "Коя команда показва списъка с блокови устройства в Linux?",
+        "opts": ["ls -l /dev", "blkid", "fdisk -l", "lsblk"],
+        "c": 3,
+        "topic": "Раздел 6"
+    },
+    {
+        "q": "Каква е функцията на командата fsck?",
+        "opts": [
+            "Форматира файловата система",
+            "Монтира файловата система",
+            "Показва размера на файловата система",
+            "Проверява и поправя консистентността на файловата система"
+        ],
+        "c": 3,
+        "topic": "Раздел 6"
+    },
+    {
+        "q": "Коя файлова система е разработена от Microsoft?",
+        "opts": ["ext4", "ReiserFS", "Btrfs", "NTFS"],
+        "c": 3,
+        "topic": "Раздел 6"
+    },
+    {
+        "q": "Коя команда показва UUID и типа на файловата система на даден дял?",
+        "opts": ["lsblk", "mount -l", "fdisk -l", "blkid"],
+        "c": 3,
+        "topic": "Раздел 6"
+    },
+    {
+        "q": "FAT32 файловата система се използва предимно за:",
+        "opts": [
+            "Сървърни Linux системи",
+            "Основни Windows системни дискове",
+            "Мрежови файлови системи",
+            "Flash памети и преносими носители"
+        ],
+        "c": 3,
+        "topic": "Раздел 6"
+    },
+    {
+        "q": "Какво е MBR (Master Boot Record)?",
+        "opts": [
+            "Модерна таблица на дялове с поддръжка за 128 дяла",
+            "Вид файлова система за Linux",
+            "Протокол за форматиране на диск",
+            "Първият сектор на диска, използван за начално зареждане"
+        ],
+        "c": 3,
+        "topic": "Раздел 6"
+    },
+    {
+        "q": "Коя команда се използва за управление на дискови дялове — създаване, изтриване, промяна?",
+        "opts": ["lsblk", "blkid", "mount", "fdisk"],
+        "c": 3,
+        "topic": "Раздел 6"
+    },
+    # ── РАЗДЕЛ 7: SHELL СКРИПТИРАНЕ ────────────────────────────────────────
+    {
+        "q": "Какво представлява shebang линията в shell скрипт?",
+        "opts": [
+            "Коментар, обясняващ целта на скрипта",
+            "Последният ред на скрипта",
+            "Декларация на глобална променлива",
+            "Първият ред, указващ кой интерпретатор да се използва (напр. #!/bin/bash)"
+        ],
+        "c": 3,
+        "topic": "Раздел 7"
+    },
+    {
+        "q": "Коя команда дава право на изпълнение на shell скрипт?",
+        "opts": ["chown +x script.sh", "exec script.sh", "run +x script.sh", "chmod +x script.sh"],
+        "c": 3,
+        "topic": "Раздел 7"
+    },
+    {
+        "q": "Как се изпълнява скрипт, когато НЕ е в PATH директорията?",
+        "opts": ["script.sh", "run script.sh", "bash -run script.sh", "./script.sh"],
+        "c": 3,
+        "topic": "Раздел 7"
+    },
+    {
+        "q": "Как правилно се декларира променлива в bash?",
+        "opts": ["var name = value", "$name=value", "let name = value", "name=value"],
+        "c": 3,
+        "topic": "Раздел 7"
+    },
+    {
+        "q": "Как се получава стойността на променлива name в bash?",
+        "opts": ["{name}", "@name", "#name", "$name"],
+        "c": 3,
+        "topic": "Раздел 7"
+    },
+    {
+        "q": "Коя команда чете вход от потребителя и го записва в променлива?",
+        "opts": ["input", "get", "scan", "read"],
+        "c": 3,
+        "topic": "Раздел 7"
+    },
+    {
+        "q": "Какво прави операторът >> при пренасочване на изход в bash?",
+        "opts": [
+            "Изтрива файла и записва новото съдържание",
+            "Чете от файл",
+            "Пренасочва само съобщенията за грешки",
+            "Добавя изхода в края на файл, без да го изтрива"
+        ],
+        "c": 3,
+        "topic": "Раздел 7"
+    },
+    {
+        "q": "С каква ключова дума завършва if блокът в bash?",
+        "opts": ["end", "endif", "done", "fi"],
+        "c": 3,
+        "topic": "Раздел 7"
+    },
+    {
+        "q": "Кой оператор сравнява две числа за РАВЕНСТВО в bash условие?",
+        "opts": ["==", "=", "-is", "-eq"],
+        "c": 3,
+        "topic": "Раздел 7"
+    },
+    {
+        "q": "Какво прави командата elif в bash?",
+        "opts": [
+            "Завършва if блока",
+            "Изпълнява код, ако всички условия са неверни",
+            "Повтаря условната проверка",
+            "Проверява допълнително условие, ако предишното е невярно"
+        ],
+        "c": 3,
+        "topic": "Раздел 7"
+    },
+    {
+        "q": "Какво прави цикълът while в bash?",
+        "opts": [
+            "Изпълнява код точно определен брой пъти",
+            "Изпълнява код докато условието е НЕВЯРНО",
+            "Изпълнява код само веднъж",
+            "Изпълнява код докато условието е ВЯРНО"
+        ],
+        "c": 3,
+        "topic": "Раздел 7"
+    },
+    {
+        "q": "С каква ключова дума завършва for/while цикъл в bash?",
+        "opts": ["end", "fi", "endfor", "done"],
+        "c": 3,
+        "topic": "Раздел 7"
+    },
+    {
+        "q": "Какво представлява $# в bash скрипт?",
+        "opts": [
+            "Стойността на последния аргумент",
+            "Пътят до изпълнявания скрипт",
+            "Изходният код на последната команда",
+            "Броят на аргументите, подадени на скрипта"
+        ],
+        "c": 3,
+        "topic": "Раздел 7"
+    },
+    {
+        "q": "Какво прави командата break в цикъл?",
+        "opts": [
+            "Прескача текущата итерация и преминава към следващата",
+            "Завършва целия скрипт",
+            "Извежда съобщение за грешка",
+            "Прекратява изпълнението на целия цикъл"
+        ],
+        "c": 3,
+        "topic": "Раздел 7"
+    },
+    {
+        "q": "Какво прави командата continue в цикъл?",
+        "opts": [
+            "Прекратява изпълнението на цикъла",
+            "Завършва скрипта с код 0",
+            "Повтаря текущата итерация отначало",
+            "Прескача остатъка от текущата итерация и преминава към следващата"
+        ],
+        "c": 3,
+        "topic": "Раздел 7"
+    },
+]
+
+import json
+q_json = json.dumps(QUESTIONS, ensure_ascii=False, indent=2)
+
+HTML = f"""<!DOCTYPE html>
 <html lang="bg">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Тест — Файлови системи и Shell скриптиране</title>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  :root{
+  *{{box-sizing:border-box;margin:0;padding:0}}
+  :root{{
     --green:#2E7D32;--green-l:#43A047;--green-pale:#E8F5E9;
     --orange:#E65C00;--red:#C62828;--blue:#1565C0;
     --shadow:0 4px 18px rgba(0,0,0,.13);
-  }
-  body{
+  }}
+  body{{
     font-family:'Segoe UI',Arial,sans-serif;
     background:linear-gradient(135deg,#E8F5E9 0%,#F1F8E9 100%);
     min-height:100vh;display:flex;align-items:center;justify-content:center;
     padding:12px;
-  }
-  .card{
+  }}
+  .card{{
     background:#fff;border-radius:20px;box-shadow:var(--shadow);
     width:100%;max-width:680px;overflow:hidden;
-  }
-  .card-header{
+  }}
+  .card-header{{
     background:var(--green);padding:22px 28px 18px;
     display:flex;flex-direction:column;gap:4px;
-  }
-  .card-header h1{color:#fff;font-size:1.25rem;line-height:1.3}
-  .card-header .sub{color:#A5D6A7;font-size:.85rem}
-  .card-body{padding:28px 28px 24px}
+  }}
+  .card-header h1{{color:#fff;font-size:1.25rem;line-height:1.3}}
+  .card-header .sub{{color:#A5D6A7;font-size:.85rem}}
+  .card-body{{padding:28px 28px 24px}}
 
   /* START */
-  .field{margin-bottom:18px}
-  .field label{display:block;font-weight:600;color:#333;margin-bottom:6px;font-size:.95rem}
-  .field input,.field select{
+  .field{{margin-bottom:18px}}
+  .field label{{display:block;font-weight:600;color:#333;margin-bottom:6px;font-size:.95rem}}
+  .field input,.field select{{
     width:100%;padding:11px 14px;border:2px solid #C8E6C9;
     border-radius:10px;font-size:1rem;outline:none;
     transition:border .2s;
-  }
-  .field input:focus,.field select:focus{border-color:var(--green)}
-  .btn{
+  }}
+  .field input:focus,.field select:focus{{border-color:var(--green)}}
+  .btn{{
     display:block;width:100%;padding:14px;
     background:var(--green);color:#fff;border:none;
     border-radius:12px;font-size:1.05rem;font-weight:700;
     cursor:pointer;transition:background .2s;letter-spacing:.3px;
-  }
-  .btn:hover{background:var(--green-l)}
-  .btn:disabled{background:#aaa;cursor:not-allowed}
+  }}
+  .btn:hover{{background:var(--green-l)}}
+  .btn:disabled{{background:#aaa;cursor:not-allowed}}
 
   /* PROGRESS */
-  .progress-wrap{margin-bottom:20px}
-  .progress-bar-bg{
+  .progress-wrap{{margin-bottom:20px}}
+  .progress-bar-bg{{
     height:8px;background:#E8F5E9;border-radius:4px;overflow:hidden;
-  }
-  .progress-bar{height:100%;background:var(--green);border-radius:4px;transition:width .35s}
-  .progress-meta{
+  }}
+  .progress-bar{{height:100%;background:var(--green);border-radius:4px;transition:width .35s}}
+  .progress-meta{{
     display:flex;justify-content:space-between;
     font-size:.82rem;color:#666;margin-top:5px;
-  }
+  }}
 
   /* QUESTION */
-  .topic-badge{
+  .topic-badge{{
     display:inline-block;background:var(--green-pale);color:var(--green);
     font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:20px;
     margin-bottom:12px;letter-spacing:.3px;
-  }
-  .question-text{
+  }}
+  .question-text{{
     font-size:1.08rem;font-weight:600;color:#1a1a1a;
     line-height:1.5;margin-bottom:20px;
-  }
-  .options{display:flex;flex-direction:column;gap:10px}
-  .opt{
+  }}
+  .options{{display:flex;flex-direction:column;gap:10px}}
+  .opt{{
     display:flex;align-items:center;gap:12px;
     padding:13px 16px;border:2px solid #E0E0E0;border-radius:12px;
     cursor:pointer;transition:border .15s,background .15s;
     font-size:.98rem;color:#222;
-  }
-  .opt:hover{border-color:var(--green);background:#F1F8E9}
-  .opt.selected{border-color:var(--green);background:#E8F5E9;font-weight:600}
-  .opt-letter{
+  }}
+  .opt:hover{{border-color:var(--green);background:#F1F8E9}}
+  .opt.selected{{border-color:var(--green);background:#E8F5E9;font-weight:600}}
+  .opt-letter{{
     width:30px;height:30px;border-radius:50%;
     background:var(--green);color:#fff;
     display:flex;align-items:center;justify-content:center;
     font-weight:700;font-size:.85rem;flex-shrink:0;
-  }
-  .opt.selected .opt-letter{background:var(--green)}
+  }}
+  .opt.selected .opt-letter{{background:var(--green)}}
 
-  .nav-row{
+  .nav-row{{
     display:flex;gap:10px;margin-top:22px;
-  }
-  .btn-next{
+  }}
+  .btn-next{{
     flex:1;padding:13px;background:var(--green);color:#fff;
     border:none;border-radius:12px;font-size:1rem;font-weight:700;
     cursor:pointer;transition:background .2s;
-  }
-  .btn-next:hover{background:var(--green-l)}
-  .btn-next:disabled{background:#ccc;cursor:not-allowed}
+  }}
+  .btn-next:hover{{background:var(--green-l)}}
+  .btn-next:disabled{{background:#ccc;cursor:not-allowed}}
 
   /* RESULT */
-  .score-circle{
+  .score-circle{{
     width:130px;height:130px;border-radius:50%;
     margin:0 auto 20px;display:flex;flex-direction:column;
     align-items:center;justify-content:center;
     font-size:2.5rem;font-weight:800;
     border:6px solid var(--green);color:var(--green);
-  }
-  .score-circle .score-label{font-size:.7rem;font-weight:500;color:#555}
-  .result-info{
+  }}
+  .score-circle .score-label{{font-size:.7rem;font-weight:500;color:#555}}
+  .result-info{{
     background:#F9FBE7;border-radius:12px;padding:14px;
     margin:14px 0;font-size:.9rem;color:#333;
-  }
-  .result-info p{margin:4px 0}
-  .status-msg{
+  }}
+  .result-info p{{margin:4px 0}}
+  .status-msg{{
     text-align:center;padding:10px;border-radius:8px;
     font-size:.9rem;font-weight:600;margin-top:12px;
-  }
-  .status-ok{background:#E8F5E9;color:var(--green)}
-  .status-err{background:#FFEBEE;color:var(--red)}
+  }}
+  .status-ok{{background:#E8F5E9;color:var(--green)}}
+  .status-err{{background:#FFEBEE;color:var(--red)}}
 
   /* CHEATING */
-  .cheat-icon{font-size:4rem;text-align:center;margin-bottom:12px}
-  .cheat-title{
+  .cheat-icon{{font-size:4rem;text-align:center;margin-bottom:12px}}
+  .cheat-title{{
     font-size:1.4rem;font-weight:800;color:var(--red);
     text-align:center;margin-bottom:10px;
-  }
-  .cheat-msg{
+  }}
+  .cheat-msg{{
     font-size:1rem;color:#444;text-align:center;
     line-height:1.6;
-  }
-  .cheat-score{
+  }}
+  .cheat-score{{
     text-align:center;margin-top:18px;font-size:1.1rem;
     font-weight:700;color:#555;
-  }
+  }}
 
-  .timer{
+  .timer{{
     font-size:.82rem;color:#888;font-weight:600;
-  }
-  @media(max-width:480px){
-    .card-body{padding:18px 16px 16px}
-    .card-header{padding:16px 18px 14px}
-    .card-header h1{font-size:1.1rem}
-    .question-text{font-size:1rem}
-  }
+  }}
+  @media(max-width:480px){{
+    .card-body{{padding:18px 16px 16px}}
+    .card-header{{padding:16px 18px 14px}}
+    .card-header h1{{font-size:1.1rem}}
+    .question-text{{font-size:1rem}}
+  }}
 </style>
 </head>
 <body>
@@ -234,7 +483,7 @@
 <script>
 // ── Данни ─────────────────────────────────────────────────────────────────
 const GF_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeOtO5l32B_gjOT-teKRVOdHwH3qYSThvwHRPP4puzkcoIGWw/formResponse';
-const GF = {
+const GF = {{
   Ученик:      'entry.846304712',
   Клас:        'entry.1675358834',
   Верни:       'entry.256789767',
@@ -243,345 +492,14 @@ const GF = {
   Нарушение:   'entry.1355958976',
   Отговорени:  'entry.1055391325',
   Детайли:     'entry.1413354067',
-};
+}};
 
-const QUESTIONS = [
-  {
-    "q": "Какво представлява файловата система?",
-    "opts": [
-      "Физическо устройство за съхранение на данни",
-      "Механизъм, контролиращ организацията, достъпа и съхранението на данни",
-      "Програма за управление на процеси",
-      "Протокол за мрежова комуникация"
-    ],
-    "c": 1,
-    "topic": "Раздел 6"
-  },
-  {
-    "q": "На колко байта е стандартният размер на един сектор на твърдия диск?",
-    "opts": [
-      "256 байта",
-      "4096 байта",
-      "1024 байта",
-      "512 байта"
-    ],
-    "c": 3,
-    "topic": "Раздел 6"
-  },
-  {
-    "q": "Файловата система ext4 е характерна предимно за:",
-    "opts": [
-      "Windows",
-      "macOS",
-      "Linux",
-      "FreeBSD"
-    ],
-    "c": 2,
-    "topic": "Раздел 6"
-  },
-  {
-    "q": "Каква е максималната дискова памет, поддържана от MBR?",
-    "opts": [
-      "512 GB",
-      "4 TB",
-      "8 ZB",
-      "2 TB"
-    ],
-    "c": 3,
-    "topic": "Раздел 6"
-  },
-  {
-    "q": "Колко първични дяла (primary partitions) поддържа MBR схемата?",
-    "opts": [
-      "2",
-      "8",
-      "128",
-      "4"
-    ],
-    "c": 3,
-    "topic": "Раздел 6"
-  },
-  {
-    "q": "GPT (GUID Partition Table) поддържа до колко дяла?",
-    "opts": [
-      "4",
-      "32",
-      "128",
-      "64"
-    ],
-    "c": 2,
-    "topic": "Раздел 6"
-  },
-  {
-    "q": "Коя команда в Linux монтира файлова система?",
-    "opts": [
-      "lsblk",
-      "fsck",
-      "fdisk",
-      "mount"
-    ],
-    "c": 3,
-    "topic": "Раздел 6"
-  },
-  {
-    "q": "Коя команда демонтира (unmount) файлова система в Linux?",
-    "opts": [
-      "dismount",
-      "detach",
-      "unmount",
-      "umount"
-    ],
-    "c": 3,
-    "topic": "Раздел 6"
-  },
-  {
-    "q": "Коя команда показва списъка с блокови устройства в Linux?",
-    "opts": [
-      "ls -l /dev",
-      "blkid",
-      "fdisk -l",
-      "lsblk"
-    ],
-    "c": 3,
-    "topic": "Раздел 6"
-  },
-  {
-    "q": "Каква е функцията на командата fsck?",
-    "opts": [
-      "Форматира файловата система",
-      "Монтира файловата система",
-      "Показва размера на файловата система",
-      "Проверява и поправя консистентността на файловата система"
-    ],
-    "c": 3,
-    "topic": "Раздел 6"
-  },
-  {
-    "q": "Коя файлова система е разработена от Microsoft?",
-    "opts": [
-      "ext4",
-      "ReiserFS",
-      "Btrfs",
-      "NTFS"
-    ],
-    "c": 3,
-    "topic": "Раздел 6"
-  },
-  {
-    "q": "Коя команда показва UUID и типа на файловата система на даден дял?",
-    "opts": [
-      "lsblk",
-      "mount -l",
-      "fdisk -l",
-      "blkid"
-    ],
-    "c": 3,
-    "topic": "Раздел 6"
-  },
-  {
-    "q": "FAT32 файловата система се използва предимно за:",
-    "opts": [
-      "Сървърни Linux системи",
-      "Основни Windows системни дискове",
-      "Мрежови файлови системи",
-      "Flash памети и преносими носители"
-    ],
-    "c": 3,
-    "topic": "Раздел 6"
-  },
-  {
-    "q": "Какво е MBR (Master Boot Record)?",
-    "opts": [
-      "Модерна таблица на дялове с поддръжка за 128 дяла",
-      "Вид файлова система за Linux",
-      "Протокол за форматиране на диск",
-      "Първият сектор на диска, използван за начално зареждане"
-    ],
-    "c": 3,
-    "topic": "Раздел 6"
-  },
-  {
-    "q": "Коя команда се използва за управление на дискови дялове — създаване, изтриване, промяна?",
-    "opts": [
-      "lsblk",
-      "blkid",
-      "mount",
-      "fdisk"
-    ],
-    "c": 3,
-    "topic": "Раздел 6"
-  },
-  {
-    "q": "Какво представлява shebang линията в shell скрипт?",
-    "opts": [
-      "Коментар, обясняващ целта на скрипта",
-      "Последният ред на скрипта",
-      "Декларация на глобална променлива",
-      "Първият ред, указващ кой интерпретатор да се използва (напр. #!/bin/bash)"
-    ],
-    "c": 3,
-    "topic": "Раздел 7"
-  },
-  {
-    "q": "Коя команда дава право на изпълнение на shell скрипт?",
-    "opts": [
-      "chown +x script.sh",
-      "exec script.sh",
-      "run +x script.sh",
-      "chmod +x script.sh"
-    ],
-    "c": 3,
-    "topic": "Раздел 7"
-  },
-  {
-    "q": "Как се изпълнява скрипт, когато НЕ е в PATH директорията?",
-    "opts": [
-      "script.sh",
-      "run script.sh",
-      "bash -run script.sh",
-      "./script.sh"
-    ],
-    "c": 3,
-    "topic": "Раздел 7"
-  },
-  {
-    "q": "Как правилно се декларира променлива в bash?",
-    "opts": [
-      "var name = value",
-      "$name=value",
-      "let name = value",
-      "name=value"
-    ],
-    "c": 3,
-    "topic": "Раздел 7"
-  },
-  {
-    "q": "Как се получава стойността на променлива name в bash?",
-    "opts": [
-      "{name}",
-      "@name",
-      "#name",
-      "$name"
-    ],
-    "c": 3,
-    "topic": "Раздел 7"
-  },
-  {
-    "q": "Коя команда чете вход от потребителя и го записва в променлива?",
-    "opts": [
-      "input",
-      "get",
-      "scan",
-      "read"
-    ],
-    "c": 3,
-    "topic": "Раздел 7"
-  },
-  {
-    "q": "Какво прави операторът >> при пренасочване на изход в bash?",
-    "opts": [
-      "Изтрива файла и записва новото съдържание",
-      "Чете от файл",
-      "Пренасочва само съобщенията за грешки",
-      "Добавя изхода в края на файл, без да го изтрива"
-    ],
-    "c": 3,
-    "topic": "Раздел 7"
-  },
-  {
-    "q": "С каква ключова дума завършва if блокът в bash?",
-    "opts": [
-      "end",
-      "endif",
-      "done",
-      "fi"
-    ],
-    "c": 3,
-    "topic": "Раздел 7"
-  },
-  {
-    "q": "Кой оператор сравнява две числа за РАВЕНСТВО в bash условие?",
-    "opts": [
-      "==",
-      "=",
-      "-is",
-      "-eq"
-    ],
-    "c": 3,
-    "topic": "Раздел 7"
-  },
-  {
-    "q": "Какво прави командата elif в bash?",
-    "opts": [
-      "Завършва if блока",
-      "Изпълнява код, ако всички условия са неверни",
-      "Повтаря условната проверка",
-      "Проверява допълнително условие, ако предишното е невярно"
-    ],
-    "c": 3,
-    "topic": "Раздел 7"
-  },
-  {
-    "q": "Какво прави цикълът while в bash?",
-    "opts": [
-      "Изпълнява код точно определен брой пъти",
-      "Изпълнява код докато условието е НЕВЯРНО",
-      "Изпълнява код само веднъж",
-      "Изпълнява код докато условието е ВЯРНО"
-    ],
-    "c": 3,
-    "topic": "Раздел 7"
-  },
-  {
-    "q": "С каква ключова дума завършва for/while цикъл в bash?",
-    "opts": [
-      "end",
-      "fi",
-      "endfor",
-      "done"
-    ],
-    "c": 3,
-    "topic": "Раздел 7"
-  },
-  {
-    "q": "Какво представлява $# в bash скрипт?",
-    "opts": [
-      "Стойността на последния аргумент",
-      "Пътят до изпълнявания скрипт",
-      "Изходният код на последната команда",
-      "Броят на аргументите, подадени на скрипта"
-    ],
-    "c": 3,
-    "topic": "Раздел 7"
-  },
-  {
-    "q": "Какво прави командата break в цикъл?",
-    "opts": [
-      "Прескача текущата итерация и преминава към следващата",
-      "Завършва целия скрипт",
-      "Извежда съобщение за грешка",
-      "Прекратява изпълнението на целия цикъл"
-    ],
-    "c": 3,
-    "topic": "Раздел 7"
-  },
-  {
-    "q": "Какво прави командата continue в цикъл?",
-    "opts": [
-      "Прекратява изпълнението на цикъла",
-      "Завършва скрипта с код 0",
-      "Повтаря текущата итерация отначало",
-      "Прескача остатъка от текущата итерация и преминава към следващата"
-    ],
-    "c": 3,
-    "topic": "Раздел 7"
-  }
-];
+const QUESTIONS = {q_json};
 
 // ── Стейт ─────────────────────────────────────────────────────────────────
 let shuffled = [];        // разбъркани въпроси, всеки с разбъркани опции
 let current  = 0;         // текущ индекс
-let answers  = [];        // { given: idx, correct: bool }
+let answers  = [];        // {{ given: idx, correct: bool }}
 let studentName  = '';
 let studentClass = '';
 let startTime    = 0;
@@ -589,47 +507,47 @@ let quizDone     = false;
 let tabLocked    = false; // спираме повторна засечка
 
 // ── Shuffle ────────────────────────────────────────────────────────────────
-function shuffle(arr) {
+function shuffle(arr) {{
   const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
+  for (let i = a.length - 1; i > 0; i--) {{
     const j = Math.floor(Math.random() * (i + 1));
     [a[i], a[j]] = [a[j], a[i]];
-  }
+  }}
   return a;
-}
+}}
 
-function prepareQuestions() {
+function prepareQuestions() {{
   const qShuffled = shuffle(QUESTIONS);
-  return qShuffled.map(q => {
+  return qShuffled.map(q => {{
     // Разбъркваме опциите, помним кой е верният текст
     const correctText = q.opts[q.c];
     const shuffledOpts = shuffle(q.opts);
-    return {
+    return {{
       q:    q.q,
       opts: shuffledOpts,
       c:    shuffledOpts.indexOf(correctText),
       topic: q.topic
-    };
-  });
-}
+    }};
+  }});
+}}
 
 // ── Таймер ─────────────────────────────────────────────────────────────────
 let timerInterval;
-function startTimer() {
+function startTimer() {{
   startTime = Date.now();
-  timerInterval = setInterval(() => {
+  timerInterval = setInterval(() => {{
     const sec = Math.floor((Date.now() - startTime) / 1000);
     const m = String(Math.floor(sec / 60)).padStart(2,'0');
     const s = String(sec % 60).padStart(2,'0');
-    document.getElementById('timer').textContent = `⏱ ${m}:${s}`;
-  }, 1000);
-}
+    document.getElementById('timer').textContent = `⏱ ${{m}}:${{s}}`;
+  }}, 1000);
+}}
 
 // ── Старт ─────────────────────────────────────────────────────────────────
-function startQuiz() {
+function startQuiz() {{
   studentName  = document.getElementById('inp-name').value.trim();
   studentClass = document.getElementById('inp-class').value.trim();
-  if (!studentName) { alert('Моля въведете трите си имена.'); return; }
+  if (!studentName) {{ alert('Моля въведете трите си имена.'); return; }}
 
   shuffled = prepareQuestions();
   current  = 0;
@@ -639,20 +557,20 @@ function startQuiz() {
   renderQuestion();
   startTimer();
   enableTabDetection();
-}
+}}
 
 // ── Рендиране на въпрос ────────────────────────────────────────────────────
 const LETTERS = ['А', 'Б', 'В', 'Г'];
 let selectedOpt = null;
 
-function renderQuestion() {
+function renderQuestion() {{
   const q   = shuffled[current];
   const num = current + 1;
   const tot = shuffled.length;
 
-  document.getElementById('quiz-sub').textContent   = `Въпрос ${num} от ${tot}`;
-  document.getElementById('q-counter').textContent  = `Въпрос ${num} / ${tot}`;
-  document.getElementById('progress-bar').style.width = `${(num/tot)*100}%`;
+  document.getElementById('quiz-sub').textContent   = `Въпрос ${{num}} от ${{tot}}`;
+  document.getElementById('q-counter').textContent  = `Въпрос ${{num}} / ${{tot}}`;
+  document.getElementById('progress-bar').style.width = `${{(num/tot)*100}}%`;
   document.getElementById('q-topic').textContent    = q.topic;
   document.getElementById('q-text').textContent     = q.q;
 
@@ -661,40 +579,40 @@ function renderQuestion() {
   selectedOpt = null;
   document.getElementById('btn-next').disabled = true;
 
-  q.opts.forEach((opt, i) => {
+  q.opts.forEach((opt, i) => {{
     const div = document.createElement('div');
     div.className = 'opt';
-    div.innerHTML = `<div class="opt-letter">${LETTERS[i]}</div><span>${opt}</span>`;
+    div.innerHTML = `<div class="opt-letter">${{LETTERS[i]}}</div><span>${{opt}}</span>`;
     div.addEventListener('click', () => selectOpt(i, div, optsEl));
     optsEl.appendChild(div);
-  });
+  }});
 
   const isLast = current === shuffled.length - 1;
   document.getElementById('btn-next').textContent = isLast ? '✔ Предай теста' : 'Следващ въпрос →';
-}
+}}
 
-function selectOpt(idx, el, container) {
+function selectOpt(idx, el, container) {{
   container.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
   el.classList.add('selected');
   selectedOpt = idx;
   document.getElementById('btn-next').disabled = false;
-}
+}}
 
-function nextQuestion() {
+function nextQuestion() {{
   if (selectedOpt === null) return;
   const q = shuffled[current];
-  answers.push({ given: selectedOpt, correct: selectedOpt === q.c });
+  answers.push({{ given: selectedOpt, correct: selectedOpt === q.c }});
 
-  if (current < shuffled.length - 1) {
+  if (current < shuffled.length - 1) {{
     current++;
     renderQuestion();
-  } else {
+  }} else {{
     finishQuiz(false);
-  }
-}
+  }}
+}}
 
 // ── Завършване ─────────────────────────────────────────────────────────────
-function finishQuiz(cheated) {
+function finishQuiz(cheated) {{
   if (quizDone) return;
   quizDone = true;
   clearInterval(timerInterval);
@@ -706,15 +624,15 @@ function finishQuiz(cheated) {
   const grade    = calcGrade(correct, shuffled.length);
   const pct      = Math.round(correct / shuffled.length * 100);
 
-  if (cheated) {
+  if (cheated) {{
     show('screen-cheat');
     document.getElementById('cheat-score').textContent =
-      `Оценка: ${grade}`;
+      `Оценка: ${{grade}}`;
     document.getElementById('cheat-send').innerHTML =
       `<div style="font-size:.85rem;color:#666;margin-bottom:8px">Изпрати резултата до учителя:</div>`;
-  } else {
+  }} else {{
     show('screen-result');
-    document.getElementById('result-name-sub').textContent = `${studentName} · ${studentClass}`;
+    document.getElementById('result-name-sub').textContent = `${{studentName}} · ${{studentClass}}`;
     const circ = document.getElementById('score-circle');
     circ.style.borderColor = grade >= 5 ? 'var(--green)' : grade === 4 ? 'var(--blue)' : 'var(--red)';
     circ.style.color       = grade >= 5 ? 'var(--green)' : grade === 4 ? 'var(--blue)' : 'var(--red)';
@@ -722,60 +640,60 @@ function finishQuiz(cheated) {
     document.getElementById('score-label').textContent = 'Оценка';
     document.getElementById('result-info').innerHTML =
       `<p style="text-align:center;font-size:1rem;color:#555">
-         ${studentName} · ${studentClass}
+         ${{studentName}} · ${{studentClass}}
        </p>
        <p style="text-align:center;margin-top:8px;font-size:.9rem;color:#888">
-         Времетраене: ${fmtTime(elapsed)}
+         Времетраене: ${{fmtTime(elapsed)}}
        </p>`;
-  }
+  }}
 
   submitResult(correct, totalAnswered, elapsed, grade, cheated);
-}
+}}
 
-function calcGrade(correct, total) {
+function calcGrade(correct, total) {{
   const pct = correct / total * 100;
   if (pct >= 93) return 6;
   if (pct >= 79) return 5;
   if (pct >= 60) return 4;
   if (pct >= 42) return 3;
   return 2;
-}
+}}
 
-function fmtTime(sec) {
+function fmtTime(sec) {{
   const m = Math.floor(sec / 60), s = sec % 60;
-  return `${m}м ${s}с`;
-}
+  return `${{m}}м ${{s}}с`;
+}}
 
 // ── Изпращане чрез Formspree ──────────────────────────────────────────────
-function submitResult(correct, answered, elapsed, grade, cheated) {
+function submitResult(correct, answered, elapsed, grade, cheated) {{
   const payload = buildPayload(cheated ? 'ДА — напусна прозореца!' : 'НЕ');
 
-  const setStatus = (html, cls) => {
+  const setStatus = (html, cls) => {{
     const t = cheated
       ? document.getElementById('cheat-send')
       : document.getElementById('status-msg');
-    if (t) { t.innerHTML = html; t.className = cls || ''; t.style.background='transparent'; }
-  };
+    if (t) {{ t.innerHTML = html; t.className = cls || ''; t.style.background='transparent'; }}
+  }};
 
   setStatus('<span style="color:#888;font-size:.9rem">⏳ Изпращане...</span>', '');
 
   // Google Forms не връща CORS хедъри — използваме no-cors; данните се изпращат успешно
-  fetch(GF_URL, {
+  fetch(GF_URL, {{
     method: 'POST',
     mode:   'no-cors',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    headers: {{ 'Content-Type': 'application/x-www-form-urlencoded' }},
     body:   buildFormParams(cheated ? 'ДА — напусна прозореца!' : 'НЕ').toString(),
-  })
-  .then(() => {
+  }})
+  .then(() => {{
     setStatus('✅ Резултатът е изпратен до учителя!', 'status-msg status-ok');
-  })
-  .catch(() => {
+  }})
+  .catch(() => {{
     setStatus('⚠️ Няма интернет връзка — покажи екрана на учителя.', 'status-msg status-err');
-  });
-}
+  }});
+}}
 
 // ── sendBeacon — изпращане при затваряне на браузъра ─────────────────────
-function buildPayload(reason) {
+function buildPayload(reason) {{
   const total   = shuffled.length;
   const correct = answers.filter(a => a.correct).length;
   const answered = answers.length;
@@ -783,78 +701,87 @@ function buildPayload(reason) {
   const grade    = calcGrade(correct, total);
   const pct      = Math.round(correct / total * 100);
 
-  const details = answers.map((a, i) => {
+  const details = answers.map((a, i) => {{
     const q     = shuffled[i];
     const given = q.opts[a.given] || '—';
     const right = q.opts[q.c];
-    return `${i+1}. [${a.correct ? '✓' : '✗'}] ${q.q} → ${given}${a.correct ? '' : ' (Верен: ' + right + ')'}`;
-  }).join('\n');
+    return `${{i+1}}. [${{a.correct ? '✓' : '✗'}}] ${{q.q}} → ${{given}}${{a.correct ? '' : ' (Верен: ' + right + ')'}}`;
+  }}).join('\\n');
 
-  return {
+  return {{
     Ученик:      studentName  || '(неизвестен)',
     Клас:        studentClass || '—',
-    Верни:       `${correct} / ${total} (${pct}%)`,
+    Верни:       `${{correct}} / ${{total}} (${{pct}}%)`,
     Оценка:      grade,
     Времетраене: fmtTime(elapsed),
     Нарушение:   reason,
-    Отговорени:  `${answered} / ${total}`,
+    Отговорени:  `${{answered}} / ${{total}}`,
     Детайли:     details,
-  };
-}
+  }};
+}}
 
-function buildFormParams(reason) {
+function buildFormParams(reason) {{
   const p = buildPayload(reason);
   const params = new URLSearchParams();
   params.append('fvv', '1');
   Object.entries(GF).forEach(([key, entry]) => params.append(entry, p[key] ?? ''));
   return params;
-}
+}}
 
-function sendBeaconResult(reason) {
+function sendBeaconResult(reason) {{
   if (!startTime || answers.length === 0) return;
   const blob = new Blob([buildFormParams(reason).toString()],
-    { type: 'application/x-www-form-urlencoded' });
+    {{ type: 'application/x-www-form-urlencoded' }});
   navigator.sendBeacon(GF_URL, blob);
-}
+}}
 
 // beforeunload — затваряне на браузъра / таб / навигация
-window.addEventListener('beforeunload', function() {
-  if (!quizDone && answers.length > 0) {
+window.addEventListener('beforeunload', function() {{
+  if (!quizDone && answers.length > 0) {{
     sendBeaconResult('ДА — затвори браузъра/таб без да предаде');
-  }
-});
+  }}
+}});
 
 // ── Детекция на смяна на таб / прозорец ───────────────────────────────────
-function enableTabDetection() {
+function enableTabDetection() {{
   document.addEventListener('visibilitychange', onVisibilityChange);
   window.addEventListener('blur', onWindowBlur);
-}
+}}
 
-function onVisibilityChange() {
-  if (document.hidden && !quizDone && !tabLocked) {
+function onVisibilityChange() {{
+  if (document.hidden && !quizDone && !tabLocked) {{
     tabLocked = true;
     finishQuiz(true);
-  }
-}
+  }}
+}}
 
 let blurTimer;
-function onWindowBlur() {
+function onWindowBlur() {{
   if (quizDone || tabLocked) return;
   // Кратко забавяне — избягваме false positives при клик в браузъра
-  blurTimer = setTimeout(() => {
-    if (!quizDone && !tabLocked) {
+  blurTimer = setTimeout(() => {{
+    if (!quizDone && !tabLocked) {{
       tabLocked = true;
       finishQuiz(true);
-    }
-  }, 400);
-}
+    }}
+  }}, 400);
+}}
 window.addEventListener('focus', () => clearTimeout(blurTimer));
 
 // ── Helpers ────────────────────────────────────────────────────────────────
-function show(id) {
+function show(id) {{
   ['screen-start','screen-quiz','screen-result','screen-cheat']
     .forEach(s => document.getElementById(s).style.display = s===id ? '' : 'none');
-}
+}}
 </script>
 </body>
-</html>
+</html>"""
+
+OUT.write_text(HTML, encoding='utf-8')
+print(f'✅ HTML тестът е записан:\n   {OUT}')
+print(f'\n📌 Следваща стъпка — Formspree:')
+print(f'   1. Отиди на https://formspree.io и създай безплатен акаунт')
+print(f'   2. Натисни "New Form" → дай му име (напр. "Тест ОС")')
+print(f'   3. Копирай ID-то от URL-а (8 знака, напр. xpwrjkzg)')
+print(f'   4. Отвори HTML файла и замени YOUR_FORM_ID с твоето ID')
+print(f'   5. Запази и пробвай!')

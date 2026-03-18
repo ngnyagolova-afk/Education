@@ -805,6 +805,7 @@ function buildPayload(reason) {
 function buildFormParams(reason) {
   const p = buildPayload(reason);
   const params = new URLSearchParams();
+  params.append('fvv', '1');
   Object.entries(GF).forEach(([key, entry]) => params.append(entry, p[key] ?? ''));
   return params;
 }
