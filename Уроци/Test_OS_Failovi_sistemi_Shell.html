@@ -227,12 +227,13 @@
       резултатите са изпратени до учителя.
     </div>
     <div class="cheat-score" id="cheat-score"></div>
+  <div style="margin-top:18px;text-align:center" id="cheat-send"></div>
   </div>
 </div>
 
 <script>
 // ── Данни ─────────────────────────────────────────────────────────────────
-const FORMSPREE = 'https://formspree.io/f/YOUR_FORM_ID'; // ← замени с твоя Formspree ID
+const TEACHER_EMAIL = 'ngnyagolova@gmail.com';
 
 const QUESTIONS = [
   {
@@ -699,6 +700,8 @@ function finishQuiz(cheated) {
     show('screen-cheat');
     document.getElementById('cheat-score').textContent =
       `Отговорени: ${totalAnswered} / ${shuffled.length} | Верни: ${correct} | Оценка: ${grade}`;
+    document.getElementById('cheat-send').innerHTML =
+      `<div style="font-size:.85rem;color:#666;margin-bottom:8px">Изпрати резултата до учителя:</div>`;
   } else {
     show('screen-result');
     document.getElementById('result-name-sub').textContent = `${studentName} · ${studentClass}`;
@@ -731,50 +734,58 @@ function fmtTime(sec) {
   return `${m}м ${s}с`;
 }
 
-// ── Изпращане към Formspree ────────────────────────────────────────────────
+// ── Изпращане чрез mailto: ────────────────────────────────────────────────
 function submitResult(correct, answered, elapsed, grade, cheated) {
   const total = shuffled.length;
+  const pct   = Math.round(correct / total * 100);
 
-  // Детайли по въпрос (за учителя)
+  // Детайли по въпрос
   const details = answers.map((a, i) => {
-    const q = shuffled[i];
+    const q     = shuffled[i];
     const given = q.opts[a.given] || '—';
     const right = q.opts[q.c];
-    return `В${i+1}: ${a.correct ? '✓' : '✗'} | Отговор: "${given}"${a.correct ? '' : ` | Верен: "${right}"`}`;
-  }).join('\n');
+    const mark  = a.correct ? '✓' : '✗';
+    return `${i+1}. [${mark}] ${q.q}\n   Отговор: ${given}${a.correct ? '' : '\n   Верен:   ' + right}`;
+  }).join('\n\n');
 
-  const body = {
-    Ученик:          studentName,
-    Клас:            studentClass,
-    Верни:           `${correct} / ${total}`,
-    Процент:         `${Math.round(correct/total*100)}%`,
-    Оценка:          grade,
-    Времетраене:     fmtTime(elapsed),
-    Отговорени:      answered,
-    Нарушение:       cheated ? 'ДА — смени таб/прозорец' : 'НЕ',
-    Детайли:         details,
-  };
+  const subject = encodeURIComponent(
+    `Тест ОС | ${studentName} | ${studentClass} | Оценка: ${grade}`
+  );
+  const body = encodeURIComponent(
+`РЕЗУЛТАТ ОТ ТЕСТ — Файлови системи и Shell скриптиране
+${'-'.repeat(55)}
+Ученик:       ${studentName}
+Клас:         ${studentClass}
+Верни:        ${correct} / ${total} (${pct}%)
+Оценка:       ${grade}
+Времетраене:  ${fmtTime(elapsed)}
+Отговорени:   ${answered} / ${total}
+Нарушение:    ${cheated ? 'ДА — напусна прозореца!' : 'НЕ'}
+${'-'.repeat(55)}
 
-  fetch(FORMSPREE, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
-    body: JSON.stringify(body)
-  })
-  .then(r => r.json())
-  .then(d => {
-    const el = document.getElementById('status-msg');
-    if (el) {
-      el.textContent = d.ok ? '✅ Резултатът е изпратен успешно до учителя!' : '⚠️ Грешка при изпращане — покажи екрана на учителя.';
-      el.className   = d.ok ? 'status-msg status-ok' : 'status-msg status-err';
-    }
-  })
-  .catch(() => {
-    const el = document.getElementById('status-msg');
-    if (el) {
-      el.textContent = '⚠️ Няма мрежа — покажи екрана на учителя.';
-      el.className   = 'status-msg status-err';
-    }
-  });
+ДЕТАЙЛИ ПО ВЪПРОСИ:
+${details}`
+  );
+
+  const mailLink = `mailto:${TEACHER_EMAIL}?subject=${subject}&body=${body}`;
+
+  // Показваме бутон за изпращане
+  const el = document.getElementById('status-msg');
+  if (el) {
+    el.innerHTML = `
+      <div style="margin-bottom:10px;color:#555;font-size:.9rem">
+        Натисни бутона — ще се отвори имейл клиентът с попълнени резултати.
+      </div>
+      <a href="${mailLink}"
+         style="display:inline-block;background:#2E7D32;color:#fff;
+                padding:12px 28px;border-radius:10px;font-weight:700;
+                font-size:1rem;text-decoration:none;border:none;cursor:pointer"
+         onclick="this.textContent='✅ Имейлът е готов!';this.style.background='#1565C0'">
+        📧 Изпрати резултата до учителя
+      </a>`;
+    el.className = 'status-msg';
+    el.style.background = 'transparent';
+  }
 }
 
 // ── Детекция на смяна на таб / прозорец ───────────────────────────────────
