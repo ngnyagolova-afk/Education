@@ -482,17 +482,7 @@ HTML = f"""<!DOCTYPE html>
 
 <script>
 // ── Данни ─────────────────────────────────────────────────────────────────
-const GF_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeOtO5l32B_gjOT-teKRVOdHwH3qYSThvwHRPP4puzkcoIGWw/formResponse';
-const GF = {{
-  Ученик:      'entry.846304712',
-  Клас:        'entry.1675358834',
-  Верни:       'entry.256789767',
-  Оценка:      'entry.945780811',
-  Времетраене: 'entry.883004936',
-  Нарушение:   'entry.1355958976',
-  Отговорени:  'entry.1055391325',
-  Детайли:     'entry.1413354067',
-}};
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbw9PRcu9IOiX1_egu4uH7lubJpiO_FDd01DDqpVzwP84gFCjEXI3z_2sMKIgqLUbTXF/exec';
 
 const QUESTIONS = {q_json};
 
@@ -677,10 +667,8 @@ function submitResult(correct, answered, elapsed, grade, cheated) {{
 
   setStatus('<span style="color:#888;font-size:.9rem">⏳ Изпращане...</span>', '');
 
-  // Google Forms не връща CORS хедъри — използваме no-cors; данните се изпращат успешно
-  fetch(GF_URL, {{
+  fetch(GAS_URL, {{
     method: 'POST',
-    mode:   'no-cors',
     headers: {{ 'Content-Type': 'application/x-www-form-urlencoded' }},
     body:   buildFormParams(cheated ? 'ДА — напусна прозореца!' : 'НЕ').toString(),
   }})
@@ -723,10 +711,7 @@ function buildPayload(reason) {{
 function buildFormParams(reason) {{
   const p = buildPayload(reason);
   const params = new URLSearchParams();
-  params.append('fvv', '1');
-  params.append('fbzx', Math.floor(Math.random() * 9e15).toString());
-  params.append('pageHistory', '0');
-  Object.entries(GF).forEach(([key, entry]) => params.append(entry, p[key] ?? ''));
+  Object.keys(p).forEach(key => params.append(key, p[key] ?? ''));
   return params;
 }}
 
@@ -734,7 +719,7 @@ function sendBeaconResult(reason) {{
   if (!startTime || answers.length === 0) return;
   const blob = new Blob([buildFormParams(reason).toString()],
     {{ type: 'application/x-www-form-urlencoded' }});
-  navigator.sendBeacon(GF_URL, blob);
+  navigator.sendBeacon(GAS_URL, blob);
 }}
 
 // beforeunload — затваряне на браузъра / таб / навигация
