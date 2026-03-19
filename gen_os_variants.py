@@ -171,7 +171,7 @@ for r in sh.runs:
 
 scale_tbl = doc.add_table(rows=2, cols=6)
 scale_tbl.style = 'Table Grid'
-scale_headers = ['Верни отговори', '0 – 12', '13 – 17', '18 – 23', '24 – 28', '29 – 30']
+scale_headers = ['Верни отговори', '0 – 12', '13 – 16', '17 – 20', '21 – 25', '26 – 30']
 scale_grades  = ['Оценка',         '2 (Слаб)', '3 (Среден)', '4 (Добър)', '5 (Мн. добър)', '6 (Отличен)']
 bg_colors     = ['1F497D', 'FFCCCC', 'FFE5CC', 'FFFFCC', 'CCFFCC', 'CCECFF']
 fg_colors     = [RGBColor(0xFF,0xFF,0xFF)] + [RGBColor(0x11,0x11,0x11)]*5
@@ -278,7 +278,7 @@ for v in range(1, NUM_VARIANTS + 1):
     sc = doc.add_paragraph()
     sc.paragraph_format.space_before = Pt(2)
     sc.paragraph_format.space_after  = Pt(4)
-    sr = sc.add_run('Скала: 0–12 → 2  |  13–17 → 3  |  18–23 → 4  |  24–28 → 5  |  29–30 → 6')
+    sr = sc.add_run('Скала: 0–12 → 2  |  13–16 → 3  |  17–20 → 4  |  21–25 → 5  |  26–30 → 6')
     sr.font.size = Pt(8.5)
     sr.font.italic = True
     sr.font.color.rgb = RGBColor(0x44, 0x44, 0x44)

@@ -178,19 +178,19 @@
         </div>
         <div style="flex:1;padding:5px 2px;background:#FFF3E0;border-right:1px solid #ddd">
           <div style="color:#E65C00;font-weight:700;font-size:1.1rem">3</div>
-          <div style="color:#555">13 – 17</div>
+          <div style="color:#555">13 – 16</div>
         </div>
         <div style="flex:1;padding:5px 2px;background:#FFFDE7;border-right:1px solid #ddd">
           <div style="color:#F57F17;font-weight:700;font-size:1.1rem">4</div>
-          <div style="color:#555">18 – 23</div>
+          <div style="color:#555">17 – 20</div>
         </div>
         <div style="flex:1;padding:5px 2px;background:#E8F5E9;border-right:1px solid #ddd">
           <div style="color:#2E7D32;font-weight:700;font-size:1.1rem">5</div>
-          <div style="color:#555">24 – 28</div>
+          <div style="color:#555">21 – 25</div>
         </div>
         <div style="flex:1;padding:5px 2px;background:#E3F2FD">
           <div style="color:#1565C0;font-weight:700;font-size:1.1rem">6</div>
-          <div style="color:#555">29 – 30</div>
+          <div style="color:#555">26 – 30</div>
         </div>
       </div>
     </div>
@@ -750,11 +750,10 @@ function finishQuiz(cheated) {
 }
 
 function calcGrade(correct, total) {
-  const pct = correct / total * 100;
-  if (pct >= 93) return 6;
-  if (pct >= 79) return 5;
-  if (pct >= 60) return 4;
-  if (pct >= 42) return 3;
+  if (correct >= 26) return 6;
+  if (correct >= 21) return 5;
+  if (correct >= 17) return 4;
+  if (correct >= 13) return 3;
   return 2;
 }
 
