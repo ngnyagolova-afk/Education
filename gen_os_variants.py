@@ -164,6 +164,40 @@ for r in sub.runs:
 
 doc.add_paragraph()
 
+# ── Скала за оценяване ────────────────────────────────────────────────────
+sh = doc.add_heading('Скала за оценяване  (30 въпроса × 1 т.)', level=1)
+for r in sh.runs:
+    r.font.color.rgb = RGBColor(0x1F, 0x49, 0x7D)
+
+scale_tbl = doc.add_table(rows=2, cols=6)
+scale_tbl.style = 'Table Grid'
+scale_headers = ['Верни отговори', '0 – 12', '13 – 17', '18 – 23', '24 – 28', '29 – 30']
+scale_grades  = ['Оценка',         '2 (Слаб)', '3 (Среден)', '4 (Добър)', '5 (Мн. добър)', '6 (Отличен)']
+bg_colors     = ['1F497D', 'FFCCCC', 'FFE5CC', 'FFFFCC', 'CCFFCC', 'CCECFF']
+fg_colors     = [RGBColor(0xFF,0xFF,0xFF)] + [RGBColor(0x11,0x11,0x11)]*5
+
+for ci, (h_text, g_text, bg, fg) in enumerate(zip(scale_headers, scale_grades, bg_colors, fg_colors)):
+    hc = scale_tbl.rows[0].cells[ci]
+    gc = scale_tbl.rows[1].cells[ci]
+    hc.text = h_text
+    gc.text = g_text
+    for cell in (hc, gc):
+        tc = cell._tc
+        tcPr = tc.get_or_add_tcPr()
+        shd = OxmlElement('w:shd')
+        shd.set(qn('w:val'), 'clear')
+        shd.set(qn('w:color'), 'auto')
+        shd.set(qn('w:fill'), bg)
+        tcPr.append(shd)
+        for p in cell.paragraphs:
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            for r in p.runs:
+                r.font.bold = True
+                r.font.size = Pt(10)
+                r.font.color.rgb = fg
+
+doc.add_paragraph()
+
 # Обобщена таблица с ключовете на всички варианти
 kh = doc.add_heading('Обобщен ключ — всички 26 варианта', level=1)
 for r in kh.runs:
@@ -240,7 +274,15 @@ for v in range(1, NUM_VARIANTS + 1):
                 r.font.size = Pt(9)
         cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
 
-    doc.add_paragraph()
+    # Скала за оценяване под метаданните
+    sc = doc.add_paragraph()
+    sc.paragraph_format.space_before = Pt(2)
+    sc.paragraph_format.space_after  = Pt(4)
+    sr = sc.add_run('Скала: 0–12 → 2  |  13–17 → 3  |  18–23 → 4  |  24–28 → 5  |  29–30 → 6')
+    sr.font.size = Pt(8.5)
+    sr.font.italic = True
+    sr.font.color.rgb = RGBColor(0x44, 0x44, 0x44)
+    sc.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
     # Въпроси
     current_section = ''
