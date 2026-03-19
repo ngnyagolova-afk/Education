@@ -409,12 +409,39 @@ HTML = f"""<!DOCTYPE html>
       <label>Клас</label>
       <input type="text" id="inp-class" value="11А" autocomplete="off"/>
     </div>
-    <div class="result-info" style="margin-bottom:16px">
+    <div class="result-info" style="margin-bottom:12px">
       📌 &nbsp;<strong>Правила:</strong><br>
       • 30 въпроса с по 4 варианта<br>
       • Въпросите и отговорите са разбъркани индивидуално<br>
       • <strong style="color:#C62828">При смяна на таб или прозорец — тестът приключва автоматично!</strong><br>
       • Резултатът се изпраща директно до учителя
+    </div>
+    <div style="margin-bottom:16px;border:2px solid #2E7D32;border-radius:10px;overflow:hidden">
+      <div style="background:#2E7D32;color:#fff;font-weight:700;font-size:.88rem;padding:6px 12px">
+        📊 Скала за оценяване (30 въпроса)
+      </div>
+      <div style="display:flex;text-align:center;font-size:.82rem">
+        <div style="flex:1;padding:5px 2px;background:#FFEBEE;border-right:1px solid #ddd">
+          <div style="color:#C62828;font-weight:700;font-size:1.1rem">2</div>
+          <div style="color:#555">0 – 12</div>
+        </div>
+        <div style="flex:1;padding:5px 2px;background:#FFF3E0;border-right:1px solid #ddd">
+          <div style="color:#E65C00;font-weight:700;font-size:1.1rem">3</div>
+          <div style="color:#555">13 – 17</div>
+        </div>
+        <div style="flex:1;padding:5px 2px;background:#FFFDE7;border-right:1px solid #ddd">
+          <div style="color:#F57F17;font-weight:700;font-size:1.1rem">4</div>
+          <div style="color:#555">18 – 23</div>
+        </div>
+        <div style="flex:1;padding:5px 2px;background:#E8F5E9;border-right:1px solid #ddd">
+          <div style="color:#2E7D32;font-weight:700;font-size:1.1rem">5</div>
+          <div style="color:#555">24 – 28</div>
+        </div>
+        <div style="flex:1;padding:5px 2px;background:#E3F2FD">
+          <div style="color:#1565C0;font-weight:700;font-size:1.1rem">6</div>
+          <div style="color:#555">29 – 30</div>
+        </div>
+      </div>
     </div>
     <button class="btn" id="btn-start" onclick="startQuiz()">🚀 Започни теста</button>
   </div>
