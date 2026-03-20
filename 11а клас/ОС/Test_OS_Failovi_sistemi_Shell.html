@@ -612,7 +612,6 @@ let startTime    = 0;
 let quizDone     = false;
 let tabLocked    = false; // спираме повторна засечка
 let cheatReason  = 'НЕ';
-let originalArea = 0;    // площ на viewport при старт (за split-screen / PiP)
 
 const QUESTION_TIME = 60; // секунди на въпрос
 let qTimerInterval  = null;
@@ -697,8 +696,6 @@ function startQuiz() {
   current  = 0;
   answers  = [];
 
-  originalArea = window.innerWidth * window.innerHeight;
-
   show('screen-quiz');
   renderQuestion();
   startTimer();
@@ -766,6 +763,7 @@ function finishQuiz(cheated) {
   if (quizDone) return;
   quizDone = true;
   stopQuestionTimer();
+  clearInterval(viewportPollInterval);
   tabLocked = true;
 
   const totalAnswered = answers.length;
@@ -889,17 +887,31 @@ window.addEventListener('beforeunload', function() {
 });
 
 // ── Детекция на split-screen / picture-in-picture ─────────────────────────
+// Сравняваме с физическия екран (screen.width/height) — той не се мени.
+// В split screen viewport-ът е ~50% от екрана → надеждно засичане.
+// Ротацията НЕ се засича — площта остава същата (само w↔h се разменят).
+const SCREEN_AREA = window.screen.width * window.screen.height;
+let viewportPollInterval = null;
+
 function enableResizeDetection() {
-  window.addEventListener('resize', onWindowResize);
+  window.addEventListener('resize', checkViewportSize);
+  if ('visualViewport' in window) {
+    window.visualViewport.addEventListener('resize', checkViewportSize);
+  }
+  // Полинг на всеки 600ms — улавя случаите, в които resize event не се задейства
+  viewportPollInterval = setInterval(checkViewportSize, 600);
 }
 
-function onWindowResize() {
+function checkViewportSize() {
   if (quizDone || tabLocked) return;
   const currentArea = window.innerWidth * window.innerHeight;
-  // Праг 65%: split-screen → ~50% площ, PiP → много по-малко
-  // Ротация не се засича — площта остава същата (само w и h се разменят)
-  if (currentArea < originalArea * 0.65) {
+  // Праг 60% от физическия екран:
+  //   Пълен екран  → ~90-95% от SCREEN_AREA
+  //   Split 50/50  → ~45-47% от SCREEN_AREA  ← засича се
+  //   PiP          → <20%                     ← засича се
+  if (currentArea < SCREEN_AREA * 0.60) {
     tabLocked = true;
+    clearInterval(viewportPollInterval);
     cheatReason = 'ДА — мултитаскинг / картина в картина';
     const el = document.getElementById('cheat-reason');
     if (el) el.textContent = 'Засечен мултитаскинг / картина в картина';
