@@ -250,7 +250,7 @@
 <div class="card" id="screen-cheat" style="display:none">
   <div class="card-header" style="background:#C62828">
     <h1>⛔ Тестът беше прекратен</h1>
-    <div class="sub" style="color:#FFCDD2">Засечена смяна на прозорец / таб</div>
+    <div class="sub" style="color:#FFCDD2" id="cheat-reason">Засечена смяна на прозорец / таб</div>
   </div>
   <div class="card-body">
     <div class="cheat-icon">🚫</div>
@@ -611,6 +611,8 @@ let studentClass = '';
 let startTime    = 0;
 let quizDone     = false;
 let tabLocked    = false; // спираме повторна засечка
+let cheatReason  = 'НЕ';
+let originalArea = 0;    // площ на viewport при старт (за split-screen / PiP)
 
 const QUESTION_TIME = 60; // секунди на въпрос
 let qTimerInterval  = null;
@@ -695,10 +697,13 @@ function startQuiz() {
   current  = 0;
   answers  = [];
 
+  originalArea = window.innerWidth * window.innerHeight;
+
   show('screen-quiz');
   renderQuestion();
   startTimer();
   enableTabDetection();
+  enableResizeDetection();
 }
 
 // ── Рендиране на въпрос ────────────────────────────────────────────────────
@@ -810,7 +815,7 @@ function fmtTime(sec) {
 
 // ── Изпращане чрез Formspree ──────────────────────────────────────────────
 function submitResult(correct, answered, elapsed, grade, cheated) {
-  const payload = buildPayload(cheated ? 'ДА — напусна прозореца!' : 'НЕ');
+  const reason = cheated ? cheatReason : 'НЕ';
 
   const setStatus = (html, cls) => {
     const t = cheated
@@ -824,7 +829,7 @@ function submitResult(correct, answered, elapsed, grade, cheated) {
   fetch(GAS_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body:   buildFormParams(cheated ? 'ДА — напусна прозореца!' : 'НЕ').toString(),
+    body:   buildFormParams(reason).toString(),
   })
   .then(() => {
     setStatus('✅ Резултатът е изпратен до учителя!', 'status-msg status-ok');
@@ -879,9 +884,28 @@ function sendBeaconResult(reason) {
 // beforeunload — затваряне на браузъра / таб / навигация
 window.addEventListener('beforeunload', function() {
   if (!quizDone && answers.length > 0) {
-    sendBeaconResult('ДА — затвори браузъра/таб без да предаде');
+    sendBeaconResult(cheatReason !== 'НЕ' ? cheatReason : 'ДА — затвори браузъра/таб без да предаде');
   }
 });
+
+// ── Детекция на split-screen / picture-in-picture ─────────────────────────
+function enableResizeDetection() {
+  window.addEventListener('resize', onWindowResize);
+}
+
+function onWindowResize() {
+  if (quizDone || tabLocked) return;
+  const currentArea = window.innerWidth * window.innerHeight;
+  // Праг 65%: split-screen → ~50% площ, PiP → много по-малко
+  // Ротация не се засича — площта остава същата (само w и h се разменят)
+  if (currentArea < originalArea * 0.65) {
+    tabLocked = true;
+    cheatReason = 'ДА — мултитаскинг / картина в картина';
+    const el = document.getElementById('cheat-reason');
+    if (el) el.textContent = 'Засечен мултитаскинг / картина в картина';
+    finishQuiz(true);
+  }
+}
 
 // ── Детекция на смяна на таб / прозорец ───────────────────────────────────
 function enableTabDetection() {
@@ -892,6 +916,7 @@ function enableTabDetection() {
 function onVisibilityChange() {
   if (document.hidden && !quizDone && !tabLocked) {
     tabLocked = true;
+    cheatReason = 'ДА — напусна прозореца/таб';
     finishQuiz(true);
   }
 }
@@ -903,6 +928,7 @@ function onWindowBlur() {
   blurTimer = setTimeout(() => {
     if (!quizDone && !tabLocked) {
       tabLocked = true;
+      cheatReason = 'ДА — напусна прозореца/таб';
       finishQuiz(true);
     }
   }, 400);
