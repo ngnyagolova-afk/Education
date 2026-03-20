@@ -133,8 +133,15 @@
   }
 
   .timer{
-    font-size:.82rem;color:#888;font-weight:600;
+    font-size:.88rem;font-weight:700;
+    padding:3px 11px;border-radius:20px;
+    background:#E8F5E9;color:var(--green);
+    transition:background .4s,color .4s;
+    border:2px solid #C8E6C9;
   }
+  .timer.warn{background:#FFF3E0;color:var(--orange);border-color:#FFCC80}
+  .timer.danger{background:#FFEBEE;color:var(--red);border-color:#FFCDD2;animation:pulse .6s infinite alternate}
+  @keyframes pulse{from{opacity:1}to{opacity:.6}}
   @media(max-width:480px){
     .card-body{padding:18px 16px 16px}
     .card-header{padding:16px 18px 14px}
@@ -598,12 +605,16 @@ const QUESTIONS = [
 // ── Стейт ─────────────────────────────────────────────────────────────────
 let shuffled = [];        // разбъркани въпроси, всеки с разбъркани опции
 let current  = 0;         // текущ индекс
-let answers  = [];        // { given: idx, correct: bool }
+let answers  = [];        // { given: idx|null, correct: bool, skipped: bool }
 let studentName  = '';
 let studentClass = '';
 let startTime    = 0;
 let quizDone     = false;
 let tabLocked    = false; // спираме повторна засечка
+
+const QUESTION_TIME = 60; // секунди на въпрос
+let qTimerInterval  = null;
+let qSecondsLeft    = 0;
 
 // ── Shuffle ────────────────────────────────────────────────────────────────
 function shuffle(arr) {
@@ -630,16 +641,48 @@ function prepareQuestions() {
   });
 }
 
-// ── Таймер ─────────────────────────────────────────────────────────────────
-let timerInterval;
+// ── Обратен брояч на въпрос ────────────────────────────────────────────────
+function startQuestionTimer() {
+  stopQuestionTimer();
+  qSecondsLeft = QUESTION_TIME;
+  updateQTimerDisplay();
+  qTimerInterval = setInterval(() => {
+    qSecondsLeft--;
+    updateQTimerDisplay();
+    if (qSecondsLeft <= 0) {
+      stopQuestionTimer();
+      timeoutQuestion();
+    }
+  }, 1000);
+}
+
+function stopQuestionTimer() {
+  if (qTimerInterval) { clearInterval(qTimerInterval); qTimerInterval = null; }
+}
+
+function updateQTimerDisplay() {
+  const el = document.getElementById('timer');
+  const m  = String(Math.floor(qSecondsLeft / 60)).padStart(2,'0');
+  const s  = String(qSecondsLeft % 60).padStart(2,'0');
+  el.textContent = `⏱ ${m}:${s}`;
+  el.className = 'timer' +
+    (qSecondsLeft <= 10 ? ' danger' : qSecondsLeft <= 20 ? ' warn' : '');
+}
+
+function timeoutQuestion() {
+  // Записваме въпроса като пропуснат (грешен)
+  answers.push({ given: null, correct: false, skipped: true });
+  if (current < shuffled.length - 1) {
+    current++;
+    renderQuestion();
+  } else {
+    finishQuiz(false);
+  }
+}
+
+// ── Общ таймер (само записва startTime) ────────────────────────────────────
 function startTimer() {
   startTime = Date.now();
-  timerInterval = setInterval(() => {
-    const sec = Math.floor((Date.now() - startTime) / 1000);
-    const m = String(Math.floor(sec / 60)).padStart(2,'0');
-    const s = String(sec % 60).padStart(2,'0');
-    document.getElementById('timer').textContent = `⏱ ${m}:${s}`;
-  }, 1000);
 }
 
 // ── Старт ─────────────────────────────────────────────────────────────────
@@ -688,6 +731,8 @@ function renderQuestion() {
 
   const isLast = current === shuffled.length - 1;
   document.getElementById('btn-next').textContent = isLast ? '✔ Предай теста' : 'Следващ въпрос →';
+
+  startQuestionTimer();
 }
 
 function selectOpt(idx, el, container) {
@@ -695,6 +740,7 @@ function selectOpt(idx, el, container) {
   el.classList.add('selected');
   selectedOpt = idx;
   document.getElementById('btn-next').disabled = false;
+  stopQuestionTimer(); // спира обратното броене след избор
 }
 
 function nextQuestion() {
@@ -714,7 +760,7 @@ function nextQuestion() {
 function finishQuiz(cheated) {
   if (quizDone) return;
   quizDone = true;
-  clearInterval(timerInterval);
+  stopQuestionTimer();
   tabLocked = true;
 
   const totalAnswered = answers.length;
@@ -799,7 +845,7 @@ function buildPayload(reason) {
 
   const details = answers.map((a, i) => {
     const q     = shuffled[i];
-    const given = q.opts[a.given] || '—';
+    const given = a.skipped ? '(пропуснат — изтекло времето)' : (q.opts[a.given] || '—');
     const right = q.opts[q.c];
     return `${i+1}. [${a.correct ? '✓' : '✗'}] ${q.q} → ${given}${a.correct ? '' : ' (Верен: ' + right + ')'}`;
   }).join('\n');
