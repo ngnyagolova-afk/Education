@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Тест — Делегати и функционално програмиране</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --blue:#1565C0;--blue-l:#1976D2;--blue-pale:#E3F2FD;
+    --indigo:#283593;--orange:#E65C00;--red:#C62828;
+    --shadow:0 4px 18px rgba(0,0,0,.13);
+  }
+  body{
+    font-family:'Segoe UI',Arial,sans-serif;
+    background:linear-gradient(135deg,#E3F2FD 0%,#EDE7F6 100%);
+    min-height:100vh;display:flex;align-items:center;justify-content:center;
+    padding:12px;
+  }
+  .card{
+    background:#fff;border-radius:20px;box-shadow:var(--shadow);
+    width:100%;max-width:680px;overflow:hidden;
+  }
+  .card-header{
+    background:var(--blue);padding:22px 28px 18px;
+    display:flex;flex-direction:column;gap:4px;
+  }
+  .card-header h1{color:#fff;font-size:1.25rem;line-height:1.3}
+  .card-header .sub{color:#90CAF9;font-size:.85rem}
+  .card-body{padding:28px 28px 24px}
+
+  /* START */
+  .field{margin-bottom:18px}
+  .field label{display:block;font-weight:600;color:#333;margin-bottom:6px;font-size:.95rem}
+  .field input,.field select{
+    width:100%;padding:11px 14px;border:2px solid #BBDEFB;
+    border-radius:10px;font-size:1rem;outline:none;
+    transition:border .2s;
+  }
+  .field input:focus,.field select:focus{border-color:var(--blue)}
+  .btn{
+    display:block;width:100%;padding:14px;
+    background:var(--blue);color:#fff;border:none;
+    border-radius:12px;font-size:1.05rem;font-weight:700;
+    cursor:pointer;transition:background .2s;letter-spacing:.3px;
+  }
+  .btn:hover{background:var(--blue-l)}
+  .btn:disabled{background:#aaa;cursor:not-allowed}
+
+  /* PROGRESS */
+  .progress-wrap{margin-bottom:20px}
+  .progress-bar-bg{
+    height:8px;background:var(--blue-pale);border-radius:4px;overflow:hidden;
+  }
+  .progress-bar{height:100%;background:var(--blue);border-radius:4px;transition:width .35s}
+  .progress-meta{
+    display:flex;justify-content:space-between;
+    font-size:.82rem;color:#666;margin-top:5px;
+  }
+
+  /* TASK CONTEXT */
+  .task-badge{
+    display:inline-block;background:var(--indigo);color:#fff;
+    font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:20px;
+    margin-bottom:8px;letter-spacing:.3px;
+  }
+  .task-context{
+    background:#F3F4FF;border-left:4px solid var(--indigo);
+    border-radius:0 10px 10px 0;padding:10px 14px;
+    font-size:.88rem;color:#333;line-height:1.55;
+    margin-bottom:14px;
+  }
+  .task-context strong{color:var(--indigo)}
+
+  /* QUESTION */
+  .question-text{
+    font-size:1.08rem;font-weight:600;color:#1a1a1a;
+    line-height:1.5;margin-bottom:14px;
+  }
+  .answer-area{
+    width:100%;min-height:110px;padding:12px 14px;
+    border:2px solid #BBDEFB;border-radius:12px;
+    font-size:.98rem;font-family:'Segoe UI',Arial,sans-serif;
+    resize:vertical;outline:none;transition:border .2s;
+    color:#222;line-height:1.5;
+  }
+  .answer-area:focus{border-color:var(--blue)}
+  .char-count{font-size:.78rem;color:#999;text-align:right;margin-top:4px}
+
+  .nav-row{display:flex;gap:10px;margin-top:22px}
+  .btn-next{
+    flex:1;padding:13px;background:var(--blue);color:#fff;
+    border:none;border-radius:12px;font-size:1rem;font-weight:700;
+    cursor:pointer;transition:background .2s;
+  }
+  .btn-next:hover{background:var(--blue-l)}
+  .btn-next:disabled{background:#ccc;cursor:not-allowed}
+
+  /* TIMER */
+  .timer{
+    font-size:.88rem;font-weight:700;
+    padding:3px 11px;border-radius:20px;
+    background:var(--blue-pale);color:var(--blue);
+    transition:background .4s,color .4s;
+    border:2px solid #BBDEFB;
+  }
+  .timer.warn{background:#FFF3E0;color:var(--orange);border-color:#FFCC80}
+  .timer.danger{background:#FFEBEE;color:var(--red);border-color:#FFCDD2;animation:pulse .6s infinite alternate}
+  @keyframes pulse{from{opacity:1}to{opacity:.6}}
+
+  /* RESULT */
+  .result-icon{font-size:3.5rem;text-align:center;margin-bottom:14px}
+  .result-title{
+    font-size:1.3rem;font-weight:800;color:var(--blue);
+    text-align:center;margin-bottom:12px;
+  }
+  .result-info{
+    background:#F3F4FF;border-radius:12px;padding:14px;
+    margin:14px 0;font-size:.9rem;color:#333;
+  }
+  .result-info p{margin:4px 0;line-height:1.6}
+  .status-msg{
+    text-align:center;padding:10px;border-radius:8px;
+    font-size:.9rem;font-weight:600;margin-top:12px;
+  }
+  .status-ok{background:#E8F5E9;color:#2E7D32}
+  .status-err{background:#FFEBEE;color:var(--red)}
+
+  /* CHEATING */
+  .cheat-icon{font-size:4rem;text-align:center;margin-bottom:12px}
+  .cheat-title{font-size:1.4rem;font-weight:800;color:var(--red);text-align:center;margin-bottom:10px}
+  .cheat-msg{font-size:1rem;color:#444;text-align:center;line-height:1.6}
+  .cheat-score{text-align:center;margin-top:18px;font-size:1.1rem;font-weight:700;color:#555}
+
+  @media(max-width:480px){
+    .card-body{padding:18px 16px 16px}
+    .card-header{padding:16px 18px 14px}
+    .card-header h1{font-size:1.1rem}
+    .question-text{font-size:1rem}
+    .answer-area{min-height:90px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Начален екран ──────────────────────────────── -->
+<div class="card" id="screen-start">
+  <div class="card-header">
+    <h1>💡 Тест — Делегати и функционално програмиране</h1>
+    <div class="sub">Раздел 07 · Func / Action / Predicate / LINQ · 11А клас</div>
+  </div>
+  <div class="card-body">
+    <div class="field">
+      <label>Три имена</label>
+      <input type="text" id="inp-name" placeholder="Иван Иванов Иванов" autocomplete="off"/>
+    </div>
+    <div class="field">
+      <label>Клас</label>
+      <input type="text" id="inp-class" value="11А" autocomplete="off"/>
+    </div>
+    <div class="result-info" style="margin-bottom:16px;background:#F3F4FF">
+      📌 &nbsp;<strong>Правила:</strong><br>
+      • 3 въпроса с отворен отговор (индивидуален набор за всеки ученик)<br>
+      • Пред всеки въпрос — кратко напомняне на условието на задачата<br>
+      • Общо <strong>10 минути</strong> за целия тест<br>
+      • <strong style="color:#C62828">При смяна на таб или прозорец — тестът приключва автоматично!</strong><br>
+      • Отговорите се изпращат директно до учителя
+    </div>
+    <button class="btn" id="btn-start" onclick="startQuiz()">🚀 Започни теста</button>
+  </div>
+</div>
+
+<!-- ── Въпрос ──────────────────────────────────────── -->
+<div class="card" id="screen-quiz" style="display:none">
+  <div class="card-header">
+    <h1>💡 Тест — Делегати и функционално програмиране</h1>
+    <div class="sub" id="quiz-sub">Въпрос 1 от 3</div>
+  </div>
+  <div class="card-body">
+    <div class="progress-wrap">
+      <div class="progress-bar-bg"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+      <div class="progress-meta">
+        <span id="q-counter">Въпрос 1 / 3</span>
+        <span class="timer" id="timer">⏱ 10:00</span>
+      </div>
+    </div>
+    <div class="task-badge" id="q-task-badge">Задача 1</div>
+    <div class="task-context" id="q-context"></div>
+    <div class="question-text" id="q-text"></div>
+    <textarea class="answer-area" id="q-answer" placeholder="Напиши отговора си тук…" oninput="onAnswerInput()"></textarea>
+    <div class="char-count" id="char-count">0 символа</div>
+    <div class="nav-row">
+      <button class="btn-next" id="btn-next" onclick="nextQuestion()" disabled>
+        Следващ въпрос →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Резултат ────────────────────────────────────── -->
+<div class="card" id="screen-result" style="display:none">
+  <div class="card-header">
+    <h1>✅ Тестът приключи</h1>
+    <div class="sub" id="result-name-sub"></div>
+  </div>
+  <div class="card-body">
+    <div class="result-icon">📨</div>
+    <div class="result-title">Отговорите са изпратени!</div>
+    <div class="result-info" id="result-info"></div>
+    <div class="status-msg" id="status-msg">Изпращане...</div>
+  </div>
+</div>
+
+<!-- ── Измама ──────────────────────────────────────── -->
+<div class="card" id="screen-cheat" style="display:none">
+  <div class="card-header" style="background:#C62828">
+    <h1>⛔ Тестът беше прекратен</h1>
+    <div class="sub" style="color:#FFCDD2" id="cheat-reason">Засечена смяна на прозорец / таб</div>
+  </div>
+  <div class="card-body">
+    <div class="cheat-icon">🚫</div>
+    <div class="cheat-title">Нарушение на правилата!</div>
+    <div class="cheat-msg">
+      Открихме, че сте напуснали прозореца на теста.<br>
+      Тестът беше прекратен автоматично и<br>
+      отговорите са изпратени до учителя.
+    </div>
+    <div class="cheat-score" id="cheat-score"></div>
+    <div style="margin-top:18px;text-align:center" id="cheat-send"></div>
+  </div>
+</div>
+
+<script>
+// ── GAS URL ──────────────────────────────────────────────────────────────────
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbw9PRcu9IOiX1_egu4uH7lubJpiO_FDd01DDqpVzwP84gFCjEXI3z_2sMKIgqLUbTXF/exec';
+
+// ── Въпроси (26 броя, 2 на задача × 13 задачи) ───────────────────────────────
+// Всяка записа: task (идентификатор), taskLabel, context (кратко условие), q (въпрос)
+const QUESTIONS = [
+  // ── Задача 1: Action ──────────────────────────────────────────────────────
+  {
+    id: 1,
+    taskLabel: "Задача 1 — Action делегат",
+    context: "Написал си метод <strong>ApplyAction(List&lt;int&gt; nums, Action&lt;int&gt; action)</strong>, " +
+             "който прилага подадения делегат към всеки елемент на списъка.",
+    q: "Защо се използва <code>Action&lt;int&gt;</code> вместо <code>Func&lt;int, int&gt;</code> в метода ApplyAction?"
+  },
+  {
+    id: 2,
+    taskLabel: "Задача 1 — Action делегат",
+    context: "Написал си метод <strong>ApplyAction(List&lt;int&gt; nums, Action&lt;int&gt; action)</strong>, " +
+             "който прилага подадения делегат към всеки елемент на списъка.",
+    q: "Ако извикаш метода с ламбда <code>x => Console.Write(x * 2)</code> и списъкът е <code>[1, 2, 3]</code>, " +
+       "какво ще изведе програмата?"
+  },
+
+  // ── Задача 2: KnightsOfHonor ──────────────────────────────────────────────
+  {
+    id: 3,
+    taskLabel: "Задача 2 — KnightsOfHonor",
+    context: "Четеш имена от конзолата докато не срещнеш „END". " +
+             "Използваш <strong>FindAll</strong> с <strong>Predicate&lt;string&gt;</strong>, " +
+             "за да изведеш само имената, съдържащи „Sir".",
+    q: "Какъв е типът на делегата, използван с <code>FindAll</code>, и каква е разликата му от <code>Func&lt;string, bool&gt;</code>?"
+  },
+  {
+    id: 4,
+    taskLabel: "Задача 2 — KnightsOfHonor",
+    context: "Четеш имена от конзолата докато не срещнеш „END". " +
+             "Използваш <strong>FindAll</strong> с <strong>Predicate&lt;string&gt;</strong>, " +
+             "за да изведеш само имената, съдържащи „Sir".",
+    q: "Ако входът е <code>Sir Bors → Lancelot → Sir Gawain → END</code>, какъв ще е изходът и на кои редове ще се изведе?"
+  },
+
+  // ── Задача 3: MinFunction / Aggregate ────────────────────────────────────
+  {
+    id: 5,
+    taskLabel: "Задача 3 — MinFunction с Aggregate",
+    context: "Намираш минималния елемент от <code>List&lt;int&gt;</code> като използваш " +
+             "<strong>Aggregate</strong> с ламбда <code>(acc, x) => acc &lt; x ? acc : x</code>.",
+    q: "Проследи изпълнението на <code>Aggregate((acc, x) => acc &lt; x ? acc : x)</code> върху <code>[5, 2, 8, 1]</code>. Какви са стойностите на acc на всяка стъпка?"
+  },
+  {
+    id: 6,
+    taskLabel: "Задача 3 — MinFunction с Aggregate",
+    context: "Намираш минималния елемент от <code>List&lt;int&gt;</code> като използваш " +
+             "<strong>Aggregate</strong> с ламбда <code>(acc, x) => acc &lt; x ? acc : x</code>.",
+    q: "Каква е разликата между <code>.Aggregate((acc, x) => ...)</code> и <code>.Min()</code> от LINQ? В кой случай е по-добре да използваш Aggregate?"
+  },
+
+  // ── Задача 4: OddOrEven / Predicate ───────────────────────────────────────
+  {
+    id: 7,
+    taskLabel: "Задача 4 — OddOrEven с Predicate",
+    context: "Четеш числа от конзолата. Ако <strong>броят на числата е четен</strong> — извеждаш четните; " +
+             "ако е нечетен — нечетните. Логиката е в <strong>Predicate&lt;int&gt;</strong>.",
+    q: "Как декларираш и присвояваш Predicate&lt;int&gt; за четни числа? Запиши декларацията."
+  },
+  {
+    id: 8,
+    taskLabel: "Задача 4 — OddOrEven с Predicate",
+    context: "Четеш числа от конзолата. Ако <strong>броят на числата е четен</strong> — извеждаш четните; " +
+             "ако е нечетен — нечетните. Логиката е в <strong>Predicate&lt;int&gt;</strong>.",
+    q: "Ако входът е <code>1 2 3 4</code> (4 числа — четен брой), какви числа ще се изведат и защо?"
+  },
+
+  // ── Задача 5: Aritmetics / Action<List> ───────────────────────────────────
+  {
+    id: 9,
+    taskLabel: "Задача 5 — Aritmetics с Action&lt;List&lt;int&gt;&gt;",
+    context: "Метод <strong>PrintReversed(List&lt;int&gt; nums, Action&lt;List&lt;int&gt;&gt; action)</strong> " +
+             "приема делегат, прилага го върху списъка и после извежда елементите.",
+    q: "Каква е ползата от предаването на <code>Action&lt;List&lt;int&gt;&gt;</code> като параметър вместо да напишеш директно логиката в метода?"
+  },
+  {
+    id: 10,
+    taskLabel: "Задача 5 — Aritmetics с Action&lt;List&lt;int&gt;&gt;",
+    context: "Метод <strong>PrintReversed(List&lt;int&gt; nums, Action&lt;List&lt;int&gt;&gt; action)</strong> " +
+             "приема делегат, прилага го върху списъка и после извежда елементите.",
+    q: "Ако подадеш <code>action = list => list.Sort()</code> и списъкът е <code>[3, 1, 2]</code>, " +
+       "какво ще изведе методът след изпълнение на action?"
+  },
+
+  // ── Задача 6: ReverseAndExecute ───────────────────────────────────────────
+  {
+    id: 11,
+    taskLabel: "Задача 6 — ReverseAndExecute",
+    context: "Метод <strong>ReverseAndExecute(List&lt;string&gt; words, Action&lt;string&gt; action)</strong> " +
+             "обръща списъка и после прилага action върху всеки елемент.",
+    q: "В какъв ред ще се изведат елементите на <code>[\"a\", \"b\", \"c\"]</code> след извикване на метода с <code>Console.WriteLine</code>?"
+  },
+  {
+    id: 12,
+    taskLabel: "Задача 6 — ReverseAndExecute",
+    context: "Метод <strong>ReverseAndExecute(List&lt;string&gt; words, Action&lt;string&gt; action)</strong> " +
+             "обръща списъка и после прилага action върху всеки елемент.",
+    q: "Как се предава <code>Console.WriteLine</code> като <code>Action&lt;string&gt;</code>? Запиши конкретното извикване на метода."
+  },
+
+  // ── Задача 7: NamePredicates ──────────────────────────────────────────────
+  {
+    id: 13,
+    taskLabel: "Задача 7 — NamePredicates",
+    context: "Филтрираш пълни имена (\"Иван Петров\") по два критерия: " +
+             "<strong>FirstName.Length &lt; 5</strong> И <strong>LastName.Length &lt; 6</strong>. " +
+             "Използваш два Predicate и ги комбинираш.",
+    q: "Как се комбинират два <code>Predicate&lt;string&gt;</code> с оператор <code>&&</code>? " +
+       "Може ли да се ползва директно или трябва допълнителен код? Обясни."
+  },
+  {
+    id: 14,
+    taskLabel: "Задача 7 — NamePredicates",
+    context: "Филтрираш пълни имена (\"Иван Петров\") по два критерия: " +
+             "<strong>FirstName.Length &lt; 5</strong> И <strong>LastName.Length &lt; 6</strong>. " +
+             "Използваш два Predicate и ги комбинираш.",
+    q: "Имената са <code>[\"Ana Smith\", \"Alexander Johnson\", \"Leo Fox\"]</code>. " +
+       "Кое/кои от тях преминават и двата филтъра? Обясни за всяко."
+  },
+
+  // ── Задача 8: UserComparator / Comparison<T> ─────────────────────────────
+  {
+    id: 15,
+    taskLabel: "Задача 8 — UserComparator с Comparison&lt;T&gt;",
+    context: "Сортираш обекти <strong>User</strong> по правило: ако са в един отдел — сортираш по възраст (нарастващо); " +
+             "ако са в различни отдели — сортираш по наименование на отдела.",
+    q: "Какво трябва да <strong>върне</strong> <code>Comparison&lt;User&gt;</code> делегатът, за да каже „a трябва да е преди b"? Кои са трите възможни стойности?"
+  },
+  {
+    id: 16,
+    taskLabel: "Задача 8 — UserComparator с Comparison&lt;T&gt;",
+    context: "Сортираш обекти <strong>User</strong> по правило: ако са в един отдел — сортираш по възраст (нарастващо); " +
+             "ако са в различни отдели — сортираш по наименование на отдела.",
+    q: "Какво ще се случи ако делегатът върне <code>0</code> при сравнение на двама потребители от различни отдели?"
+  },
+
+  // ── Задача 9: PredicatesList / closure capture ───────────────────────────
+  {
+    id: 17,
+    taskLabel: "Задача 9 — PredicatesList и capture на closure",
+    context: "Създаваш <code>List&lt;Predicate&lt;int&gt;&gt;</code> в цикъл: " +
+             "<code>for (int d = 2; d &lt;= 4; d++) predicates.Add(x => x == d);</code>",
+    q: "Ако НЕ използваш <code>int captured = d</code> вътре в цикъла, " +
+       "всички предикати ще проверяват за един и същ d. Каква стойност ще има d и защо?"
+  },
+  {
+    id: 18,
+    taskLabel: "Задача 9 — PredicatesList и capture на closure",
+    context: "Създаваш <code>List&lt;Predicate&lt;int&gt;&gt;</code> в цикъл: " +
+             "<code>for (int d = 2; d &lt;= 4; d++) { int c = d; predicates.Add(x => x == c); }</code>",
+    q: "С правилното capture: <code>predicates[0](2)</code>, <code>predicates[1](3)</code>, <code>predicates[2](4)</code> — " +
+       "какво ще върне всеки от тях? Обясни защо."
+  },
+
+  // ── Задача 10: PredicateParty / factory ──────────────────────────────────
+  {
+    id: 19,
+    taskLabel: "Задача 10 — PredicateParty (фабричен метод)",
+    context: "Метод <strong>MakePredicate(string name)</strong> връща <code>Predicate&lt;string&gt;</code>, " +
+             "който проверява дали подаденият стринг съдържа name.",
+    q: "Какво е <strong>closure (затваряне)</strong> в контекста на <code>MakePredicate</code>? " +
+       "Коя променлива се \"затваря\" и колко дълго живее тя?"
+  },
+  {
+    id: 20,
+    taskLabel: "Задача 10 — PredicateParty (фабричен метод)",
+    context: "Метод <strong>MakePredicate(string name)</strong> връща <code>Predicate&lt;string&gt;</code>, " +
+             "който проверява дали подаденият стринг съдържа name.",
+    q: "Ако извикаш <code>var p = MakePredicate(\"Alice\")</code> и после <code>p(\"Bob\")</code> — " +
+       "какво ще върне <code>p</code> и защо?"
+  },
+
+  // ── Задача 11: PRFM / Dictionary<string, Predicate> ──────────────────────
+  {
+    id: 21,
+    taskLabel: "Задача 11 — PRFM с Dictionary&lt;string, Predicate&lt;string&gt;&gt;",
+    context: "Имаш <code>Dictionary&lt;string, Predicate&lt;string&gt;&gt;</code> с ключове " +
+             "\"ruler\", \"compass\", \"protractor\", \"flash\" — всеки свързан с предикат.",
+    q: "Каква е разликата между <code>Dictionary&lt;string, Predicate&lt;string&gt;&gt;</code> " +
+       "и <code>List&lt;Predicate&lt;string&gt;&gt;</code> за тази задача? Кога е по-добре да ползваш речник?"
+  },
+  {
+    id: 22,
+    taskLabel: "Задача 11 — PRFM с Dictionary&lt;string, Predicate&lt;string&gt;&gt;",
+    context: "Имаш <code>Dictionary&lt;string, Predicate&lt;string&gt;&gt;</code> с ключове " +
+             "\"ruler\", \"compass\", \"protractor\", \"flash\" — всеки свързан с предикат.",
+    q: "Напиши реда код, с който извикваш предиката за <code>\"ruler\"</code> " +
+       "от речника <code>tools</code> с аргумент <code>inputLine</code>."
+  },
+
+  // ── Задача 12: InfernoIII / Func с 5 параметъра ──────────────────────────
+  {
+    id: 23,
+    taskLabel: "Задача 12 — InfernoIII с Func&lt;…, bool&gt;",
+    context: "Дефинираш <code>Func&lt;string, string, string, string, string, bool&gt;</code>, " +
+             "която проверява 5 условия за RPG предмет: name, type, level, quality, element.",
+    q: "Как се декларира и инициализира <code>Func&lt;string, string, string, string, string, bool&gt;</code> в C#? " +
+       "Запиши примерна декларация."
+  },
+  {
+    id: 24,
+    taskLabel: "Задача 12 — InfernoIII с Func&lt;…, bool&gt;",
+    context: "Дефинираш <code>Func&lt;string, string, string, string, string, bool&gt;</code>, " +
+             "която проверява 5 условия за RPG предмет: name, type, level, quality, element.",
+    q: "Защо се използва един Func с 5 параметъра вместо 5 отделни Predicate&lt;string&gt;? " +
+       "Кога тази техника е удачна?"
+  },
+
+  // ── Задача 13: TriFunction / Func като параметър ─────────────────────────
+  {
+    id: 25,
+    taskLabel: "Задача 13 — TriFunction (Func като параметър)",
+    context: "Метод <strong>ApplyFilter&lt;T&gt;(List&lt;T&gt; list, Func&lt;T, bool&gt; filter)</strong> " +
+             "приема делегат и връща нов списък само с елементите, за които filter(elem) == true.",
+    q: "Как демонстрира <code>ApplyFilter</code> принципа <strong>Open/Closed</strong> (отворен за разширение, затворен за промяна)? Обясни с конкретен пример."
+  },
+  {
+    id: 26,
+    taskLabel: "Задача 13 — TriFunction (Func като параметър)",
+    context: "Метод <strong>ApplyFilter&lt;T&gt;(List&lt;T&gt; list, Func&lt;T, bool&gt; filter)</strong> " +
+             "приема делегат и връща нов списък само с елементите, за които filter(elem) == true.",
+    q: "Как ще извикаш <code>ApplyFilter</code> с ламбда, която филтрира само числа > 10 от <code>List&lt;int&gt;</code>? " +
+       "Запиши пълния ред с извикването."
+  }
+];
+
+// ── Стейт ─────────────────────────────────────────────────────────────────
+const TOTAL_QUESTIONS = 3;
+const TOTAL_TIME_SEC  = 600; // 10 минути
+
+let myQuestions   = [];   // 3-те въпроса на конкретния ученик
+let current       = 0;
+let answers       = [];   // [{ qId, taskLabel, question, answer, answered }]
+let studentName   = '';
+let studentClass  = '';
+let startTime     = 0;
+let quizDone      = false;
+let tabLocked     = false;
+let cheatReason   = 'НЕ';
+
+let globalTimerInterval = null;
+let globalSecondsLeft   = TOTAL_TIME_SEC;
+
+// ── Seeded PRNG (LCG) ─────────────────────────────────────────────────────
+function nameToSeed(name) {
+  let hash = 5381;
+  const s = name.toLowerCase().trim();
+  for (let i = 0; i < s.length; i++) {
+    hash = (Math.imul(hash, 33) ^ s.charCodeAt(i)) >>> 0;
+  }
+  return hash || 1;
+}
+
+function seededRNG(seed) {
+  let s = seed >>> 0;
+  return function() {
+    s = (Math.imul(1664525, s) + 1013904223) >>> 0;
+    return s / 0x100000000;
+  };
+}
+
+function pickQuestions(name) {
+  const seed = nameToSeed(name);
+  const rng  = seededRNG(seed);
+  const idxs = Array.from({ length: QUESTIONS.length }, (_, i) => i);
+  // Fisher-Yates с seeded RNG
+  for (let i = idxs.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [idxs[i], idxs[j]] = [idxs[j], idxs[i]];
+  }
+  return idxs.slice(0, TOTAL_QUESTIONS).map(i => QUESTIONS[i]);
+}
+
+// ── Глобален таймер ───────────────────────────────────────────────────────
+function startGlobalTimer() {
+  globalSecondsLeft = TOTAL_TIME_SEC;
+  updateTimerDisplay();
+  globalTimerInterval = setInterval(() => {
+    globalSecondsLeft--;
+    updateTimerDisplay();
+    if (globalSecondsLeft <= 0) {
+      clearInterval(globalTimerInterval);
+      // Запишем текущия отговор ако има нещо
+      saveCurrentAnswer();
+      finishQuiz(false);
+    }
+  }, 1000);
+}
+
+function stopGlobalTimer() {
+  if (globalTimerInterval) { clearInterval(globalTimerInterval); globalTimerInterval = null; }
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('timer');
+  const m  = String(Math.floor(globalSecondsLeft / 60)).padStart(2, '0');
+  const s  = String(globalSecondsLeft % 60).padStart(2, '0');
+  el.textContent = `⏱ ${m}:${s}`;
+  el.className = 'timer' +
+    (globalSecondsLeft <= 60 ? ' danger' : globalSecondsLeft <= 180 ? ' warn' : '');
+}
+
+// ── Старт ─────────────────────────────────────────────────────────────────
+function startQuiz() {
+  studentName  = document.getElementById('inp-name').value.trim();
+  studentClass = document.getElementById('inp-class').value.trim();
+  if (!studentName) { alert('Моля въведете трите си имена.'); return; }
+
+  myQuestions = pickQuestions(studentName);
+  current = 0;
+  answers = [];
+
+  show('screen-quiz');
+  renderQuestion();
+  startTime = Date.now();
+  startGlobalTimer();
+  enableTabDetection();
+  enableResizeDetection();
+}
+
+// ── Рендиране на въпрос ────────────────────────────────────────────────────
+function renderQuestion() {
+  const q   = myQuestions[current];
+  const num = current + 1;
+  const tot = TOTAL_QUESTIONS;
+
+  document.getElementById('quiz-sub').textContent  = `Въпрос ${num} от ${tot}`;
+  document.getElementById('q-counter').textContent = `Въпрос ${num} / ${tot}`;
+  document.getElementById('progress-bar').style.width = `${(num / tot) * 100}%`;
+  document.getElementById('q-task-badge').textContent = q.taskLabel;
+  document.getElementById('q-context').innerHTML = q.context;
+  document.getElementById('q-text').innerHTML = q.q;
+
+  const ta = document.getElementById('q-answer');
+  ta.value = answers[current]?.answer || '';
+  ta.focus();
+  document.getElementById('char-count').textContent = `${ta.value.length} символа`;
+
+  const isLast = current === TOTAL_QUESTIONS - 1;
+  const btn = document.getElementById('btn-next');
+  btn.textContent = isLast ? '✔ Предай теста' : 'Следващ въпрос →';
+  btn.disabled = ta.value.trim().length === 0;
+}
+
+function onAnswerInput() {
+  const ta  = document.getElementById('q-answer');
+  const len = ta.value.length;
+  document.getElementById('char-count').textContent = `${len} символа`;
+  document.getElementById('btn-next').disabled = ta.value.trim().length === 0;
+}
+
+function saveCurrentAnswer() {
+  const q  = myQuestions[current];
+  const ta = document.getElementById('q-answer');
+  answers[current] = {
+    qId:       q.id,
+    taskLabel: q.taskLabel,
+    question:  q.q,
+    answer:    ta ? ta.value.trim() : ''
+  };
+}
+
+function nextQuestion() {
+  saveCurrentAnswer();
+  if (current < TOTAL_QUESTIONS - 1) {
+    current++;
+    renderQuestion();
+  } else {
+    finishQuiz(false);
+  }
+}
+
+// ── Завършване ─────────────────────────────────────────────────────────────
+function finishQuiz(cheated) {
+  if (quizDone) return;
+  quizDone = true;
+  stopGlobalTimer();
+  clearInterval(viewportPollInterval);
+  tabLocked = true;
+
+  const elapsed = Math.round((Date.now() - startTime) / 1000);
+  const reason  = cheated ? cheatReason : 'НЕ';
+
+  if (cheated) {
+    show('screen-cheat');
+    document.getElementById('cheat-score').textContent =
+      `Отговорени въпроси: ${answers.filter(a => a && a.answer).length} / ${TOTAL_QUESTIONS}`;
+  } else {
+    show('screen-result');
+    document.getElementById('result-name-sub').textContent = `${studentName} · ${studentClass}`;
+    document.getElementById('result-info').innerHTML =
+      `<p><strong>Ученик:</strong> ${studentName}</p>
+       <p><strong>Клас:</strong> ${studentClass}</p>
+       <p><strong>Отговорени:</strong> ${answers.filter(a => a && a.answer).length} / ${TOTAL_QUESTIONS}</p>
+       <p><strong>Времетраене:</strong> ${fmtTime(elapsed)}</p>`;
+  }
+
+  submitResult(elapsed, reason, cheated);
+}
+
+function fmtTime(sec) {
+  const m = Math.floor(sec / 60), s = sec % 60;
+  return `${m}м ${s}с`;
+}
+
+// ── Изпращане ─────────────────────────────────────────────────────────────
+function buildPayload(reason) {
+  const elapsed = Math.round((Date.now() - startTime) / 1000);
+  const details = answers.map((a, i) => {
+    if (!a) return `${i+1}. [без отговор]`;
+    return `${i+1}. [${a.taskLabel}]\nВъпрос: ${a.question.replace(/<[^>]+>/g,'')}\nОтговор: ${a.answer || '(без отговор)'}`;
+  }).join('\n\n');
+
+  return {
+    Ученик:      studentName  || '(неизвестен)',
+    Клас:        studentClass || '—',
+    Отговорени:  `${answers.filter(a => a && a.answer).length} / ${TOTAL_QUESTIONS}`,
+    Времетраене: fmtTime(elapsed),
+    Нарушение:   reason,
+    Детайли:     details,
+  };
+}
+
+function buildFormParams(reason) {
+  const p = buildPayload(reason);
+  const params = new URLSearchParams();
+  Object.keys(p).forEach(key => params.append(key, p[key] ?? ''));
+  return params;
+}
+
+function submitResult(elapsed, reason, cheated) {
+  const setStatus = (html, cls) => {
+    const t = cheated
+      ? document.getElementById('cheat-send')
+      : document.getElementById('status-msg');
+    if (t) { t.innerHTML = html; t.className = cls || ''; t.style.background = 'transparent'; }
+  };
+
+  setStatus('<span style="color:#888;font-size:.9rem">⏳ Изпращане...</span>', '');
+
+  fetch(GAS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: buildFormParams(reason).toString(),
+  })
+  .then(() => {
+    setStatus('✅ Отговорите са изпратени до учителя!', 'status-msg status-ok');
+  })
+  .catch(() => {
+    setStatus('⚠️ Няма интернет връзка — покажи екрана на учителя.', 'status-msg status-err');
+  });
+}
+
+// beforeunload
+window.addEventListener('beforeunload', function() {
+  if (!quizDone && answers.length > 0) {
+    const reason = cheatReason !== 'НЕ' ? cheatReason : 'ДА — затвори браузъра/таб без да предаде';
+    const blob = new Blob([buildFormParams(reason).toString()],
+      { type: 'application/x-www-form-urlencoded' });
+    navigator.sendBeacon(GAS_URL, blob);
+  }
+});
+
+// ── Детекция на split-screen / picture-in-picture ─────────────────────────
+const SCREEN_AREA = window.screen.width * window.screen.height;
+let viewportPollInterval = null;
+
+function enableResizeDetection() {
+  window.addEventListener('resize', checkViewportSize);
+  if ('visualViewport' in window) {
+    window.visualViewport.addEventListener('resize', checkViewportSize);
+  }
+  viewportPollInterval = setInterval(checkViewportSize, 600);
+}
+
+function checkViewportSize() {
+  if (quizDone || tabLocked) return;
+  const currentArea = window.innerWidth * window.innerHeight;
+  if (currentArea < SCREEN_AREA * 0.60) {
+    tabLocked = true;
+    clearInterval(viewportPollInterval);
+    cheatReason = 'ДА — мултитаскинг / картина в картина';
+    const el = document.getElementById('cheat-reason');
+    if (el) el.textContent = 'Засечен мултитаскинг / картина в картина';
+    saveCurrentAnswer();
+    finishQuiz(true);
+  }
+}
+
+// ── Детекция на смяна на таб / прозорец ───────────────────────────────────
+function enableTabDetection() {
+  document.addEventListener('visibilitychange', onVisibilityChange);
+  window.addEventListener('blur', onWindowBlur);
+}
+
+function onVisibilityChange() {
+  if (document.hidden && !quizDone && !tabLocked) {
+    tabLocked = true;
+    cheatReason = 'ДА — напусна прозореца/таб';
+    saveCurrentAnswer();
+    finishQuiz(true);
+  }
+}
+
+let blurTimer;
+function onWindowBlur() {
+  if (quizDone || tabLocked) return;
+  blurTimer = setTimeout(() => {
+    if (!quizDone && !tabLocked) {
+      tabLocked = true;
+      cheatReason = 'ДА — напусна прозореца/таб';
+      saveCurrentAnswer();
+      finishQuiz(true);
+    }
+  }, 400);
+}
+window.addEventListener('focus', () => clearTimeout(blurTimer));
+
+// ── Helper ────────────────────────────────────────────────────────────────
+function show(id) {
+  ['screen-start', 'screen-quiz', 'screen-result', 'screen-cheat']
+    .forEach(s => document.getElementById(s).style.display = s === id ? '' : 'none');
+}
+</script>
+</body>
+</html>
