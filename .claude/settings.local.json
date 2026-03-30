@@ -1,20 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(pip --version)",
-      "Bash(py --version)",
-      "Bash(pip3 --version)",
-      "Bash(where python:*)",
-      "Read(//c/Users/**)",
-      "Bash(ls /c/Python*)",
-      "Bash(npm --version)",
-      "Bash(powershell.exe -Command \"& ''C:\\\\Users\\\\Neli Nqgolova\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python313\\\\python.exe'' --version; & ''C:\\\\Users\\\\Neli Nqgolova\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python313\\\\python.exe'' -m pip install python-docx\")",
-      "Bash(powershell.exe -Command \":*)",
-      "Bash(powershell.exe -Command \"& ''C:\\\\Users\\\\Neli Nqgolova\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python313\\\\python.exe'' ''C:\\\\Users\\\\Neli Nqgolova\\\\Documents\\\\Education\\\\generate_plan.py''\")",
-      "Bash(powershell.exe -Command \"Remove-Item ''C:\\\\Users\\\\Neli Nqgolova\\\\Documents\\\\Education\\\\generate_plan.py''; Remove-Item ''C:\\\\Users\\\\Neli Nqgolova\\\\Documents\\\\Education\\\\Plan_Shell_Scripting_4.md''; Test-Path ''C:\\\\Users\\\\Neli Nqgolova\\\\Documents\\\\Education\\\\Plan_Shell_Scripting_4.docx''\")",
-      "Bash(gh --version)",
-      "Bash(git --version)",
-      "Bash(powershell.exe -Command \"where.exe gh\")"
+      "Bash(*)",
+      "Read(*)",
+      "Write(*)",
+      "Edit(*)",
+      "Glob(*)",
+      "Grep(*)"
     ]
   }
 }

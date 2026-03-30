@@ -1,0 +1,14 @@
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Часовник\obj\Release\net9.0-windows\Часовник.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Часовник\obj\Release\net9.0-windows\Часовник.AssemblyInfoInputs.cache
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Часовник\obj\Release\net9.0-windows\Часовник.AssemblyInfo.cs
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Часовник\obj\Release\net9.0-windows\Часовник.csproj.CoreCompileInputs.cache
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Часовник\bin\Release\net9.0-windows\Часовник.exe
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Часовник\bin\Release\net9.0-windows\Часовник.deps.json
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Часовник\bin\Release\net9.0-windows\Часовник.runtimeconfig.json
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Часовник\bin\Release\net9.0-windows\Часовник.dll
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Часовник\bin\Release\net9.0-windows\Часовник.pdb
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Часовник\obj\Release\net9.0-windows\Часовник.dll
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Часовник\obj\Release\net9.0-windows\refint\Часовник.dll
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Часовник\obj\Release\net9.0-windows\Часовник.pdb
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Часовник\obj\Release\net9.0-windows\Часовник.genruntimeconfig.cache
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Часовник\obj\Release\net9.0-windows\ref\Часовник.dll

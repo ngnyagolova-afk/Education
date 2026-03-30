@@ -1,0 +1,14 @@
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\АнимацияТочки\obj\Release\net9.0-windows\АнимацияТочки.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\АнимацияТочки\obj\Release\net9.0-windows\АнимацияТочки.AssemblyInfoInputs.cache
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\АнимацияТочки\obj\Release\net9.0-windows\АнимацияТочки.AssemblyInfo.cs
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\АнимацияТочки\obj\Release\net9.0-windows\АнимацияТочки.csproj.CoreCompileInputs.cache
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\АнимацияТочки\bin\Release\net9.0-windows\АнимацияТочки.exe
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\АнимацияТочки\bin\Release\net9.0-windows\АнимацияТочки.deps.json
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\АнимацияТочки\bin\Release\net9.0-windows\АнимацияТочки.runtimeconfig.json
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\АнимацияТочки\bin\Release\net9.0-windows\АнимацияТочки.dll
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\АнимацияТочки\bin\Release\net9.0-windows\АнимацияТочки.pdb
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\АнимацияТочки\obj\Release\net9.0-windows\АнимацияТочки.dll
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\АнимацияТочки\obj\Release\net9.0-windows\refint\АнимацияТочки.dll
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\АнимацияТочки\obj\Release\net9.0-windows\АнимацияТочки.pdb
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\АнимацияТочки\obj\Release\net9.0-windows\АнимацияТочки.genruntimeconfig.cache
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\АнимацияТочки\obj\Release\net9.0-windows\ref\АнимацияТочки.dll

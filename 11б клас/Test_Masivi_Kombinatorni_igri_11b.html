@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Тест — Комбинаторни алгоритми в игрови ситуации</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --blue:#1565C0;--blue-l:#1976D2;--blue-pale:#E3F2FD;
+    --indigo:#283593;--orange:#E65C00;--red:#C62828;
+    --shadow:0 4px 18px rgba(0,0,0,.13);
+  }
+  body{
+    font-family:'Segoe UI',Arial,sans-serif;
+    background:linear-gradient(135deg,#E3F2FD 0%,#EDE7F6 100%);
+    min-height:100vh;display:flex;align-items:center;justify-content:center;
+    padding:12px;
+  }
+  .card{
+    background:#fff;border-radius:20px;box-shadow:var(--shadow);
+    width:100%;max-width:680px;overflow:hidden;
+  }
+  .card-header{
+    background:var(--blue);padding:22px 28px 18px;
+    display:flex;flex-direction:column;gap:4px;
+  }
+  .card-header h1{color:#fff;font-size:1.25rem;line-height:1.3}
+  .card-header .sub{color:#90CAF9;font-size:.85rem}
+  .card-body{padding:28px 28px 24px}
+
+  /* START */
+  .field{margin-bottom:18px}
+  .field label{display:block;font-weight:600;color:#333;margin-bottom:6px;font-size:.95rem}
+  .field input,.field select{
+    width:100%;padding:11px 14px;border:2px solid #BBDEFB;
+    border-radius:10px;font-size:1rem;outline:none;
+    transition:border .2s;
+  }
+  .field input:focus,.field select:focus{border-color:var(--blue)}
+  .btn{
+    display:block;width:100%;padding:14px;
+    background:var(--blue);color:#fff;border:none;
+    border-radius:12px;font-size:1.05rem;font-weight:700;
+    cursor:pointer;transition:background .2s;letter-spacing:.3px;
+  }
+  .btn:hover{background:var(--blue-l)}
+  .btn:disabled{background:#aaa;cursor:not-allowed}
+
+  /* PROGRESS */
+  .progress-wrap{margin-bottom:20px}
+  .progress-bar-bg{
+    height:8px;background:var(--blue-pale);border-radius:4px;overflow:hidden;
+  }
+  .progress-bar{height:100%;background:var(--blue);border-radius:4px;transition:width .35s}
+  .progress-meta{
+    display:flex;justify-content:space-between;
+    font-size:.82rem;color:#666;margin-top:5px;
+  }
+
+  /* TASK CONTEXT */
+  .task-badge{
+    display:inline-block;background:var(--indigo);color:#fff;
+    font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:20px;
+    margin-bottom:8px;letter-spacing:.3px;
+  }
+  .task-context{
+    background:#F3F4FF;border-left:4px solid var(--indigo);
+    border-radius:0 10px 10px 0;padding:10px 14px;
+    font-size:.88rem;color:#333;line-height:1.55;
+    margin-bottom:14px;
+  }
+  .task-context strong{color:var(--indigo)}
+
+  /* QUESTION */
+  .question-text{
+    font-size:1.08rem;font-weight:600;color:#1a1a1a;
+    line-height:1.5;margin-bottom:14px;
+  }
+  .answer-area{
+    width:100%;min-height:110px;padding:12px 14px;
+    border:2px solid #BBDEFB;border-radius:12px;
+    font-size:.98rem;font-family:'Segoe UI',Arial,sans-serif;
+    resize:vertical;outline:none;transition:border .2s;
+    color:#222;line-height:1.5;
+  }
+  .answer-area:focus{border-color:var(--blue)}
+  .char-count{font-size:.78rem;color:#999;text-align:right;margin-top:4px}
+
+  .nav-row{display:flex;gap:10px;margin-top:22px}
+  .btn-next{
+    flex:1;padding:13px;background:var(--blue);color:#fff;
+    border:none;border-radius:12px;font-size:1rem;font-weight:700;
+    cursor:pointer;transition:background .2s;
+  }
+  .btn-next:hover{background:var(--blue-l)}
+  .btn-next:disabled{background:#ccc;cursor:not-allowed}
+
+  /* TIMER */
+  .timer{
+    font-size:.88rem;font-weight:700;
+    padding:3px 11px;border-radius:20px;
+    background:var(--blue-pale);color:var(--blue);
+    transition:background .4s,color .4s;
+    border:2px solid #BBDEFB;
+  }
+  .timer.warn{background:#FFF3E0;color:var(--orange);border-color:#FFCC80}
+  .timer.danger{background:#FFEBEE;color:var(--red);border-color:#FFCDD2;animation:pulse .6s infinite alternate}
+  @keyframes pulse{from{opacity:1}to{opacity:.6}}
+
+  /* RESULT */
+  .result-icon{font-size:3.5rem;text-align:center;margin-bottom:14px}
+  .result-title{
+    font-size:1.3rem;font-weight:800;color:var(--blue);
+    text-align:center;margin-bottom:12px;
+  }
+  .result-info{
+    background:#F3F4FF;border-radius:12px;padding:14px;
+    margin:14px 0;font-size:.9rem;color:#333;
+  }
+  .result-info p{margin:4px 0;line-height:1.6}
+  .status-msg{
+    text-align:center;padding:10px;border-radius:8px;
+    font-size:.9rem;font-weight:600;margin-top:12px;
+  }
+  .status-ok{background:#E8F5E9;color:#2E7D32}
+  .status-err{background:#FFEBEE;color:var(--red)}
+
+  /* CHEATING */
+  .cheat-icon{font-size:4rem;text-align:center;margin-bottom:12px}
+  .cheat-title{font-size:1.4rem;font-weight:800;color:var(--red);text-align:center;margin-bottom:10px}
+  .cheat-msg{font-size:1rem;color:#444;text-align:center;line-height:1.6}
+  .cheat-score{text-align:center;margin-top:18px;font-size:1.1rem;font-weight:700;color:#555}
+
+  @media(max-width:480px){
+    .card-body{padding:18px 16px 16px}
+    .card-header{padding:16px 18px 14px}
+    .card-header h1{font-size:1.1rem}
+    .question-text{font-size:1rem}
+    .answer-area{min-height:90px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Начален екран ──────────────────────────────── -->
+<div class="card" id="screen-start">
+  <div class="card-header">
+    <h1>🧩 Тест — Комбинаторни алгоритми в игрови ситуации</h1>
+    <div class="sub">Урок 13 · Кули на Ханой · Триъгълник на Паскал · Дамите · Шадраван · 11Б клас</div>
+  </div>
+  <div class="card-body">
+    <div class="field">
+      <label>Три имена</label>
+      <input type="text" id="inp-name" placeholder="Иван Иванов Иванов" autocomplete="off"/>
+    </div>
+    <div class="field">
+      <label>Клас</label>
+      <input type="text" id="inp-class" value="11Б" autocomplete="off"/>
+    </div>
+    <div class="result-info" style="margin-bottom:16px;background:#F3F4FF">
+      📌 &nbsp;<strong>Правила:</strong><br>
+      • 3 въпроса с отворен отговор (индивидуален набор за всеки ученик)<br>
+      • Пред всеки въпрос — кратко напомняне на темата<br>
+      • Общо <strong>10 минути</strong> за целия тест<br>
+      • <strong style="color:#C62828">При смяна на таб или прозорец — тестът приключва автоматично!</strong><br>
+      • Отговорите се изпращат директно до учителя
+    </div>
+    <button class="btn" id="btn-start" onclick="startQuiz()">🚀 Започни теста</button>
+  </div>
+</div>
+
+<!-- ── Въпрос ──────────────────────────────────────── -->
+<div class="card" id="screen-quiz" style="display:none">
+  <div class="card-header">
+    <h1>🧩 Тест — Комбинаторни алгоритми в игрови ситуации</h1>
+    <div class="sub" id="quiz-sub">Въпрос 1 от 3</div>
+  </div>
+  <div class="card-body">
+    <div class="progress-wrap">
+      <div class="progress-bar-bg"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+      <div class="progress-meta">
+        <span id="q-counter">Въпрос 1 / 3</span>
+        <span class="timer" id="timer">⏱ 10:00</span>
+      </div>
+    </div>
+    <div class="task-badge" id="q-task-badge">Задача 1</div>
+    <div class="task-context" id="q-context"></div>
+    <div class="question-text" id="q-text"></div>
+    <textarea class="answer-area" id="q-answer" placeholder="Напиши отговора си тук…" oninput="onAnswerInput()"></textarea>
+    <div class="char-count" id="char-count">0 символа</div>
+    <div class="nav-row">
+      <button class="btn-next" id="btn-next" onclick="nextQuestion()" disabled>
+        Следващ въпрос →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Резултат ────────────────────────────────────── -->
+<div class="card" id="screen-result" style="display:none">
+  <div class="card-header">
+    <h1>✅ Тестът приключи</h1>
+    <div class="sub" id="result-name-sub"></div>
+  </div>
+  <div class="card-body">
+    <div class="result-icon">📨</div>
+    <div class="result-title">Отговорите са изпратени!</div>
+    <div class="result-info" id="result-info"></div>
+    <div class="status-msg" id="status-msg">Изпращане...</div>
+  </div>
+</div>
+
+<!-- ── Измама ──────────────────────────────────────── -->
+<div class="card" id="screen-cheat" style="display:none">
+  <div class="card-header" style="background:#C62828">
+    <h1>⛔ Тестът беше прекратен</h1>
+    <div class="sub" style="color:#FFCDD2" id="cheat-reason">Засечена смяна на прозорец / таб</div>
+  </div>
+  <div class="card-body">
+    <div class="cheat-icon">🚫</div>
+    <div class="cheat-title">Нарушение на правилата!</div>
+    <div class="cheat-msg">
+      Открихме, че сте напуснали прозореца на теста.<br>
+      Тестът беше прекратен автоматично и<br>
+      отговорите са изпратени до учителя.
+    </div>
+    <div class="cheat-score" id="cheat-score"></div>
+    <div style="margin-top:18px;text-align:center" id="cheat-send"></div>
+  </div>
+</div>
+
+<script>
+// ── GAS URL ──────────────────────────────────────────────────────────────────
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbw9PRcu9IOiX1_egu4uH7lubJpiO_FDd01DDqpVzwP84gFCjEXI3z_2sMKIgqLUbTXF/exec';
+
+// ── Въпроси (20 броя, 2 на задача × 10 задачи) ───────────────────────────────
+const QUESTIONS = [
+  // ── Задача 1: Кули на Ханой — рекурсивна идея ─────────────────────────────
+  {
+    id: 1,
+    taskLabel: "Задача 1 — Кули на Ханой: рекурсивна идея",
+    context: "Задачата е: премести n диска от стълб A на стълб C, използвайки стълб B. " +
+             "Правилата: местим по 1 диск наведнъж, по-голям диск не може да стои върху по-малък. " +
+             "Рекурсивната идея разбива задачата на три стъпки.",
+    q: "Опиши трите стъпки на рекурсивния алгоритъм за Кули на Ханой при преместване на n диска от A на C. Какво е базовият случай (когато рекурсията спира)?"
+  },
+  {
+    id: 2,
+    taskLabel: "Задача 1 — Кули на Ханой: рекурсивна идея",
+    context: "Задачата е: премести n диска от стълб A на стълб C, използвайки стълб B. " +
+             "Формулата за минималния брой ходове е 2ⁿ−1.",
+    q: "При n=3 нужните ходове са 7. Колко хода са нужни при n=4 и при n=5? Обясни защо броят ходове нараства толкова бързо с увеличаването на n."
+  },
+
+  // ── Задача 2: Кули на Ханой — C# код ─────────────────────────────────────
+  {
+    id: 3,
+    taskLabel: "Задача 2 — Кули на Ханой: C# реализация",
+    context: "Методът е: <strong>static void Hanoi(int n, char a, char b, char c)</strong>. " +
+             "Параметрите a, b, c представляват стълбовете. При рекурсивно извикване ролите им се разменят: " +
+             "<code>Hanoi(n-1, a, c, b)</code> — после печатаме a→c — после <code>Hanoi(n-1, b, a, c)</code>.",
+    q: "В метода <code>Hanoi(n, a, b, c)</code>, защо при второто рекурсивно извикване <code>Hanoi(n-1, b, a, c)</code> параметрите са точно в този ред? Какво означава всеки от трите аргумента в контекста на преместването на дискове?"
+  },
+  {
+    id: 4,
+    taskLabel: "Задача 2 — Кули на Ханой: C# реализация",
+    context: "Методът е: <strong>static void Hanoi(int n, char a, char b, char c)</strong>. " +
+             "При <code>n &lt; 2</code> се извежда директен ход, иначе — рекурсия.",
+    q: "Проследи изпълнението на <code>Hanoi(2, '1', '2', '3')</code>. Какво ще изведе програмата? Изброй всички ходове в реда, в който ще се отпечатат."
+  },
+
+  // ── Задача 3: Триъгълник на Паскал — свойства ─────────────────────────────
+  {
+    id: 5,
+    taskLabel: "Задача 3 — Триъгълник на Паскал: свойства",
+    context: "Триъгълникът на Паскал позволява изчисляване на C(n,k) без факториели. " +
+             "Ключово свойство: <strong>C(n,k) = C(n-1,k-1) + C(n-1,k)</strong>. " +
+             "Всеки елемент е сума от двата над него. Лявата и дясната страна са единици.",
+    q: "Обясни свойството <code>C(n,k) = C(n-1,k-1) + C(n-1,k)</code>. Как то позволява да се построи всеки следващ ред на триъгълника, знаейки предишния? Какво е C(5,2) — пресметни стъпка по стъпка."
+  },
+  {
+    id: 6,
+    taskLabel: "Задача 3 — Триъгълник на Паскал: свойства",
+    context: "Триъгълникът на Паскал работи само до N≈66 при тип <code>long</code> (64-битов). " +
+             "За по-големи стойности се налагат специални техники.",
+    q: "Защо директното изчисляване на C(n,k) = n! / (k! · (n−k)!) е проблематично за големи n? Каква е конкретната причина Триъгълникът на Паскал да е по-удобен — какви операции използва той?"
+  },
+
+  // ── Задача 4: Триъгълник на Паскал — C# реализация ───────────────────────
+  {
+    id: 7,
+    taskLabel: "Задача 4 — Триъгълник на Паскал: C# реализация",
+    context: "В C# реализацията се използват два масива: <code>bas[]</code> (текущ ред) и <code>now[]</code> (следващ ред). " +
+             "На всяка итерация t: <code>now[i] += bas[i]</code> и <code>now[i+1] += bas[i]</code>, " +
+             "след което <code>bas = now</code>.",
+    q: "Защо реализацията използва два отделни масива <code>bas[]</code> и <code>now[]</code>? Какъв грешен резултат би се получил, ако използваме само един масив и директно обновяваме стойностите му?"
+  },
+  {
+    id: 8,
+    taskLabel: "Задача 4 — Триъгълник на Паскал: C# реализация",
+    context: "В C# реализацията: <code>bas[0] = 1</code> (начало). За всяко t от 1 до N: " +
+             "нулираме <code>now[]</code>, прилагаме <code>now[i] += bas[i]</code> и <code>now[i+1] += bas[i]</code>, " +
+             "копираме <code>bas = now</code>.",
+    q: "След изпълнение на цикъла за t=4 (т.е. изграждаме 4-тия ред), кои стойности ще са в <code>bas[0]</code> до <code>bas[4]</code>? Пресметни стъпка по стъпка."
+  },
+
+  // ── Задача 5: Задача с дамите — backtracking идея ─────────────────────────
+  {
+    id: 9,
+    taskLabel: "Задача 5 — N-Дами: принцип на backtracking",
+    context: "Задачата: постави N дами на N×N шахматна дъска така, че никоя да не заплашва друга. " +
+             "Дама заплашва по ред, колона и двата диагонала. " +
+             "Поставяме по 1 дама на ред, рекурсивно преминаваме към следващия ред.",
+    q: "Обясни принципа backtracking в задачата с дамите: кога алгоритъмът преминава напред (поставя дама), кога се 'връща назад' и какво точно прави при връщането (кои маркировки се изтриват)?"
+  },
+  {
+    id: 10,
+    taskLabel: "Задача 5 — N-Дами: принцип на backtracking",
+    context: "Проверките за конфликт са: <strong>колона</strong> (<code>colUsed[]</code>), " +
+             "<strong>главен диагонал</strong> (<code>diagUsed1[row-col+n]</code>), " +
+             "<strong>страничен диагонал</strong> (<code>diagUsed2[row+col]</code>).",
+    q: "Как се проверява дали две дами стоят на един и същ диагонал? Обясни математическата зависимост: защо за главния диагонал <code>row - col = const</code>, а за страничния <code>row + col = const</code>. Дай конкретен числов пример."
+  },
+
+  // ── Задача 6: Задача с дамите — C# код ───────────────────────────────────
+  {
+    id: 11,
+    taskLabel: "Задача 6 — N-Дами: C# реализация",
+    context: "Методът е: <strong>static void Place(int row)</strong>. " +
+             "Пробваме всяка колона t за текущия ред. При успешна проверка: маркираме и рекурсираме. " +
+             "При завръщане: размаркираме (<code>colUsed[t] = false</code>, и т.н.).",
+    q: "В метода <code>Place(row)</code> — кога се достига базовият случай и какво се случва тогава? Какво конкретно означава <code>row >= n</code> в контекста на задачата?"
+  },
+  {
+    id: 12,
+    taskLabel: "Задача 6 — N-Дами: C# реализация",
+    context: "В кода: <code>diagUsed1[row - t + n]</code> — добавяме <code>n</code> към индекса. " +
+             "Масивът <code>diagUsed1[]</code> е с размер 200.",
+    q: "Защо при <code>diagUsed1[row - t + n]</code> добавяме <code>n</code> към индекса? Какъв проблем би се получил без тази корекция при малки стойности на <code>row - t</code>?"
+  },
+
+  // ── Задача 7: Цветни комбинации — математика ──────────────────────────────
+  {
+    id: 13,
+    taskLabel: "Задача 7 — ШАДРАВАН: математика на комбинациите",
+    context: "Задача ШАДРАВАН: 3×3 квадрат с 9 квадратчета, всяко в различен цвят. " +
+             "На всяка секунда се сменят цветовете на 4 избрани квадратчета. " +
+             "Броят на всички възможни смени е C(9,4) = 126.",
+    q: "Защо броят на различните смени е точно C(9,4) = 126? Обясни защо тук се броят комбинации (без значение на реда), а не пермутации или вариации. Какво би се получило, ако редът имаше значение?"
+  },
+  {
+    id: 14,
+    taskLabel: "Задача 7 — ШАДРАВАН: математика на комбинациите",
+    context: "В задача ШАДРАВАН: всички 126 комбинации се генерират предварително и се обхождат в " +
+             "<strong>лексикографски ред</strong> — т.е. комбинациите {0,1,2,3}, {0,1,2,4}, {0,1,2,5} и т.н.",
+    q: "Какво означава 'лексикографски ред на комбинациите' в задача ШАДРАВАН? Избройте първите 5 комбинации от 9 по 4 в лексикографски ред (индекси от 0 до 8). Как генериращата функция <code>Comb(index, start)</code> гарантира точно този ред?"
+  },
+
+  // ── Задача 8: WinForms + Timer ─────────────────────────────────────────────
+  {
+    id: 15,
+    taskLabel: "Задача 8 — ШАДРАВАН: WinForms и Timer",
+    context: "В WinForms приложението: <code>Timer</code> с <code>Interval = 1000</code> (1 секунда). " +
+             "Събитието <code>timer1_Tick</code> прилага следващата комбинация от <code>allCombinations</code>. " +
+             "Броячът <code>count</code> следи коя комбинация е текущата.",
+    q: "Как работи Timer в WinForms приложението ШАДРАВАН? Какво се случва при всяко задействане на <code>timer1_Tick</code>? Ако <code>count >= allCombinations.Count</code> — какво прави кодът?"
+  },
+  {
+    id: 16,
+    taskLabel: "Задача 8 — ШАДРАВАН: WinForms и Timer",
+    context: "Структура: <code>Form1</code> с 9 <code>PictureBox</code>-а в 3×3 мрежа. " +
+             "Бутон 'Старт' стартира Timer. При всяко Tick: прилагаме комбо от <code>allCombinations[count++]</code> " +
+             "и сменяме <code>BackColor</code> на избраните PictureBox-и.",
+    q: "Обясни структурата на WinForms приложението ШАДРАВАН: колко PictureBox-а има, как са наредени, какво прави бутонът 'Старт' и как точно се визуализира смяната на цветовете при всяко Tick на таймера?"
+  },
+
+  // ── Задача 9: Рекурсия — обобщение ───────────────────────────────────────
+  {
+    id: 17,
+    taskLabel: "Задача 9 — Рекурсия: предимства и сложност",
+    context: "В урока се използват два вида рекурсия: <strong>линейна рекурсия</strong> (Триъгълник на Паскал — итеративно) " +
+             "и <strong>разклонена рекурсия</strong> (Ханой, дами — рекурсивно с разклонения). " +
+             "Задачата с дамите при N=8 има 92 решения, при N=12 — 14200 решения.",
+    q: "Каква е сложността на алгоритъма за N-Дамите в най-лош случай и защо? Как broят на решенията нараства с N? Ако N=8 дава 92 решения, защо N=12 дава 14200 — каква е разликата в мащаба?"
+  },
+  {
+    id: 18,
+    taskLabel: "Задача 9 — Рекурсия: предимства и сложност",
+    context: "При задачата Кули на Ханой: при n=64 са нужни приблизително 1.8×10¹⁹ хода. " +
+             "Ако правим по 1 ход в секунда, това би отнело повече от 500 милиарда години.",
+    q: "Защо е важно да разграничаваме 'алгоритмична сложност' от 'практическа изпълнимост'? Обясни с примера на Кули на Ханой при n=64 — алгоритъмът е коректен, но какъв е практическият проблем?"
+  },
+
+  // ── Задача 10: Обобщение на четирите алгоритъма ──────────────────────────
+  {
+    id: 19,
+    taskLabel: "Задача 10 — Обобщение: четирите алгоритъма",
+    context: "В урок 13 се разглеждат четири задачи: " +
+             "<strong>Кули на Ханой</strong> (рекурсия), " +
+             "<strong>Триъгълник на Паскал</strong> (динамично програмиране с масиви), " +
+             "<strong>N-Дами</strong> (backtracking), " +
+             "<strong>ШАДРАВАН</strong> (комбинации + WinForms Timer).",
+    q: "За всяка от четирите задачи в урока — запиши с кой основен метод/техника се решава и каква е ключовата идея. Кои две задачи използват рекурсия и как се различава приложението й в тях?"
+  },
+  {
+    id: 20,
+    taskLabel: "Задача 10 — Обобщение: четирите алгоритъма",
+    context: "Генерирането на комбинации в задача ШАДРАВАН се реализира с рекурсивния метод: " +
+             "<code>static void Comb(int index, int start)</code>. " +
+             "Базовият случай: <code>index >= k</code> — намерена е пълна комбинация.",
+    q: "Сравни алгоритъма за генериране на комбинации <code>Comb(index, start)</code> с алгоритъма за backtracking в задачата с дамите <code>Place(row)</code>. Каква е принципната разлика между двата? Кой от тях изследва всички възможности без ограничения?"
+  }
+];
+
+// ── Стейт ─────────────────────────────────────────────────────────────────
+const TOTAL_QUESTIONS = 3;
+const TOTAL_TIME_SEC  = 600; // 10 минути
+
+let myQuestions   = [];
+let current       = 0;
+let answers       = [];
+let studentName   = '';
+let studentClass  = '';
+let startTime     = 0;
+let quizDone      = false;
+let tabLocked     = false;
+let cheatReason   = 'НЕ';
+
+let globalTimerInterval = null;
+let globalSecondsLeft   = TOTAL_TIME_SEC;
+
+// ── Seeded PRNG (LCG) ─────────────────────────────────────────────────────
+function nameToSeed(name) {
+  let hash = 5381;
+  const s = name.toLowerCase().trim();
+  for (let i = 0; i < s.length; i++) {
+    hash = (Math.imul(hash, 33) ^ s.charCodeAt(i)) >>> 0;
+  }
+  return hash || 1;
+}
+
+function seededRNG(seed) {
+  let s = seed >>> 0;
+  return function() {
+    s = (Math.imul(1664525, s) + 1013904223) >>> 0;
+    return s / 0x100000000;
+  };
+}
+
+function pickQuestions(name) {
+  const seed = nameToSeed(name);
+  const rng  = seededRNG(seed);
+  const idxs = Array.from({ length: QUESTIONS.length }, (_, i) => i);
+  // Fisher-Yates с seeded RNG
+  for (let i = idxs.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [idxs[i], idxs[j]] = [idxs[j], idxs[i]];
+  }
+  return idxs.slice(0, TOTAL_QUESTIONS).map(i => QUESTIONS[i]);
+}
+
+// ── Глобален таймер ───────────────────────────────────────────────────────
+function startGlobalTimer() {
+  globalSecondsLeft = TOTAL_TIME_SEC;
+  updateTimerDisplay();
+  globalTimerInterval = setInterval(() => {
+    globalSecondsLeft--;
+    updateTimerDisplay();
+    if (globalSecondsLeft <= 0) {
+      clearInterval(globalTimerInterval);
+      saveCurrentAnswer();
+      finishQuiz(false);
+    }
+  }, 1000);
+}
+
+function stopGlobalTimer() {
+  if (globalTimerInterval) { clearInterval(globalTimerInterval); globalTimerInterval = null; }
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('timer');
+  const m  = String(Math.floor(globalSecondsLeft / 60)).padStart(2, '0');
+  const s  = String(globalSecondsLeft % 60).padStart(2, '0');
+  el.textContent = `⏱ ${m}:${s}`;
+  el.className = 'timer' +
+    (globalSecondsLeft <= 60 ? ' danger' : globalSecondsLeft <= 180 ? ' warn' : '');
+}
+
+// ── Старт ─────────────────────────────────────────────────────────────────
+function startQuiz() {
+  studentName  = document.getElementById('inp-name').value.trim();
+  studentClass = document.getElementById('inp-class').value.trim();
+  if (!studentName) { alert('Моля въведете трите си имена.'); return; }
+
+  myQuestions = pickQuestions(studentName);
+  current = 0;
+  answers = [];
+
+  show('screen-quiz');
+  renderQuestion();
+  startTime = Date.now();
+  startGlobalTimer();
+  enableTabDetection();
+  enableResizeDetection();
+}
+
+// ── Рендиране на въпрос ────────────────────────────────────────────────────
+function renderQuestion() {
+  const q   = myQuestions[current];
+  const num = current + 1;
+  const tot = TOTAL_QUESTIONS;
+
+  document.getElementById('quiz-sub').textContent  = `Въпрос ${num} от ${tot}`;
+  document.getElementById('q-counter').textContent = `Въпрос ${num} / ${tot}`;
+  document.getElementById('progress-bar').style.width = `${(num / tot) * 100}%`;
+  document.getElementById('q-task-badge').textContent = q.taskLabel;
+  document.getElementById('q-context').innerHTML = q.context;
+  document.getElementById('q-text').innerHTML = q.q;
+
+  const ta = document.getElementById('q-answer');
+  ta.value = answers[current]?.answer || '';
+  ta.focus();
+  document.getElementById('char-count').textContent = `${ta.value.length} символа`;
+
+  const isLast = current === TOTAL_QUESTIONS - 1;
+  const btn = document.getElementById('btn-next');
+  btn.textContent = isLast ? '✔ Предай теста' : 'Следващ въпрос →';
+  btn.disabled = ta.value.trim().length === 0;
+}
+
+function onAnswerInput() {
+  const ta  = document.getElementById('q-answer');
+  const len = ta.value.length;
+  document.getElementById('char-count').textContent = `${len} символа`;
+  document.getElementById('btn-next').disabled = ta.value.trim().length === 0;
+}
+
+function saveCurrentAnswer() {
+  const q  = myQuestions[current];
+  const ta = document.getElementById('q-answer');
+  answers[current] = {
+    qId:       q.id,
+    taskLabel: q.taskLabel,
+    question:  q.q,
+    answer:    ta ? ta.value.trim() : ''
+  };
+}
+
+function nextQuestion() {
+  saveCurrentAnswer();
+  if (current < TOTAL_QUESTIONS - 1) {
+    current++;
+    renderQuestion();
+  } else {
+    finishQuiz(false);
+  }
+}
+
+// ── Завършване ─────────────────────────────────────────────────────────────
+function finishQuiz(cheated) {
+  if (quizDone) return;
+  quizDone = true;
+  stopGlobalTimer();
+  clearInterval(viewportPollInterval);
+  tabLocked = true;
+
+  const elapsed = Math.round((Date.now() - startTime) / 1000);
+  const reason  = cheated ? cheatReason : 'НЕ';
+
+  if (cheated) {
+    show('screen-cheat');
+    document.getElementById('cheat-score').textContent =
+      `Отговорени въпроси: ${answers.filter(a => a && a.answer).length} / ${TOTAL_QUESTIONS}`;
+  } else {
+    show('screen-result');
+    document.getElementById('result-name-sub').textContent = `${studentName} · ${studentClass}`;
+    document.getElementById('result-info').innerHTML =
+      `<p><strong>Ученик:</strong> ${studentName}</p>
+       <p><strong>Клас:</strong> ${studentClass}</p>
+       <p><strong>Отговорени:</strong> ${answers.filter(a => a && a.answer).length} / ${TOTAL_QUESTIONS}</p>
+       <p><strong>Времетраене:</strong> ${fmtTime(elapsed)}</p>`;
+  }
+
+  submitResult(elapsed, reason, cheated);
+}
+
+function fmtTime(sec) {
+  const m = Math.floor(sec / 60), s = sec % 60;
+  return `${m}м ${s}с`;
+}
+
+// ── Изпращане ─────────────────────────────────────────────────────────────
+function buildPayload(reason) {
+  const elapsed = Math.round((Date.now() - startTime) / 1000);
+  const details = answers.map((a, i) => {
+    if (!a) return `${i+1}. [без отговор]`;
+    return `${i+1}. [${a.taskLabel}]\nВъпрос: ${a.question.replace(/<[^>]+>/g,'')}\nОтговор: ${a.answer || '(без отговор)'}`;
+  }).join('\n\n');
+
+  return {
+    Ученик:      studentName  || '(неизвестен)',
+    Клас:        studentClass || '—',
+    Отговорени:  `${answers.filter(a => a && a.answer).length} / ${TOTAL_QUESTIONS}`,
+    Времетраене: fmtTime(elapsed),
+    Нарушение:   reason,
+    Детайли:     details,
+  };
+}
+
+function buildFormParams(reason) {
+  const p = buildPayload(reason);
+  const params = new URLSearchParams();
+  Object.keys(p).forEach(key => params.append(key, p[key] ?? ''));
+  return params;
+}
+
+function submitResult(elapsed, reason, cheated) {
+  const setStatus = (html, cls) => {
+    const t = cheated
+      ? document.getElementById('cheat-send')
+      : document.getElementById('status-msg');
+    if (t) { t.innerHTML = html; t.className = cls || ''; t.style.background = 'transparent'; }
+  };
+
+  setStatus('<span style="color:#888;font-size:.9rem">⏳ Изпращане...</span>', '');
+
+  fetch(GAS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: buildFormParams(reason).toString(),
+  })
+  .then(() => {
+    setStatus('✅ Отговорите са изпратени до учителя!', 'status-msg status-ok');
+  })
+  .catch(() => {
+    setStatus('⚠️ Няма интернет връзка — покажи екрана на учителя.', 'status-msg status-err');
+  });
+}
+
+// beforeunload
+window.addEventListener('beforeunload', function() {
+  if (!quizDone && answers.length > 0) {
+    const reason = cheatReason !== 'НЕ' ? cheatReason : 'ДА — затвори браузъра/таб без да предаде';
+    const blob = new Blob([buildFormParams(reason).toString()],
+      { type: 'application/x-www-form-urlencoded' });
+    navigator.sendBeacon(GAS_URL, blob);
+  }
+});
+
+// ── Детекция на split-screen / picture-in-picture ─────────────────────────
+const SCREEN_AREA = window.screen.width * window.screen.height;
+let viewportPollInterval = null;
+
+function enableResizeDetection() {
+  window.addEventListener('resize', checkViewportSize);
+  if ('visualViewport' in window) {
+    window.visualViewport.addEventListener('resize', checkViewportSize);
+  }
+  viewportPollInterval = setInterval(checkViewportSize, 600);
+}
+
+function checkViewportSize() {
+  if (quizDone || tabLocked) return;
+  const currentArea = window.innerWidth * window.innerHeight;
+  if (currentArea < SCREEN_AREA * 0.60) {
+    tabLocked = true;
+    clearInterval(viewportPollInterval);
+    cheatReason = 'ДА — мултитаскинг / картина в картина';
+    const el = document.getElementById('cheat-reason');
+    if (el) el.textContent = 'Засечен мултитаскинг / картина в картина';
+    saveCurrentAnswer();
+    finishQuiz(true);
+  }
+}
+
+// ── Детекция на смяна на таб / прозорец ───────────────────────────────────
+function enableTabDetection() {
+  document.addEventListener('visibilitychange', onVisibilityChange);
+  window.addEventListener('blur', onWindowBlur);
+}
+
+function onVisibilityChange() {
+  if (document.hidden && !quizDone && !tabLocked) {
+    tabLocked = true;
+    cheatReason = 'ДА — напусна прозореца/таб';
+    saveCurrentAnswer();
+    finishQuiz(true);
+  }
+}
+
+let blurTimer;
+function onWindowBlur() {
+  if (quizDone || tabLocked) return;
+  blurTimer = setTimeout(() => {
+    if (!quizDone && !tabLocked) {
+      tabLocked = true;
+      cheatReason = 'ДА — напусна прозореца/таб';
+      saveCurrentAnswer();
+      finishQuiz(true);
+    }
+  }, 400);
+}
+window.addEventListener('focus', () => clearTimeout(blurTimer));
+
+// ── Helper ────────────────────────────────────────────────────────────────
+function show(id) {
+  ['screen-start', 'screen-quiz', 'screen-result', 'screen-cheat']
+    .forEach(s => document.getElementById(s).style.display = s === id ? '' : 'none');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+C:\Users\Neli Nqgolova\Desktop\Shadravan\bin\Debug\net9.0-windows\Shadravan.exe
+C:\Users\Neli Nqgolova\Desktop\Shadravan\bin\Debug\net9.0-windows\Shadravan.deps.json
+C:\Users\Neli Nqgolova\Desktop\Shadravan\bin\Debug\net9.0-windows\Shadravan.runtimeconfig.json
+C:\Users\Neli Nqgolova\Desktop\Shadravan\bin\Debug\net9.0-windows\Shadravan.dll
+C:\Users\Neli Nqgolova\Desktop\Shadravan\bin\Debug\net9.0-windows\Shadravan.pdb
+C:\Users\Neli Nqgolova\Desktop\Shadravan\obj\Debug\net9.0-windows\Shadravan.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Neli Nqgolova\Desktop\Shadravan\obj\Debug\net9.0-windows\Shadravan.AssemblyInfoInputs.cache
+C:\Users\Neli Nqgolova\Desktop\Shadravan\obj\Debug\net9.0-windows\Shadravan.AssemblyInfo.cs
+C:\Users\Neli Nqgolova\Desktop\Shadravan\obj\Debug\net9.0-windows\Shadravan.csproj.CoreCompileInputs.cache
+C:\Users\Neli Nqgolova\Desktop\Shadravan\obj\Debug\net9.0-windows\Shadravan.dll
+C:\Users\Neli Nqgolova\Desktop\Shadravan\obj\Debug\net9.0-windows\refint\Shadravan.dll
+C:\Users\Neli Nqgolova\Desktop\Shadravan\obj\Debug\net9.0-windows\Shadravan.pdb
+C:\Users\Neli Nqgolova\Desktop\Shadravan\obj\Debug\net9.0-windows\Shadravan.genruntimeconfig.cache
+C:\Users\Neli Nqgolova\Desktop\Shadravan\obj\Debug\net9.0-windows\ref\Shadravan.dll

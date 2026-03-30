@@ -1,0 +1,14 @@
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Трансформации\obj\Release\net9.0-windows\Трансформации.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Трансформации\obj\Release\net9.0-windows\Трансформации.AssemblyInfoInputs.cache
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Трансформации\obj\Release\net9.0-windows\Трансформации.AssemblyInfo.cs
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Трансформации\obj\Release\net9.0-windows\Трансформации.csproj.CoreCompileInputs.cache
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Трансформации\bin\Release\net9.0-windows\Трансформации.exe
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Трансформации\bin\Release\net9.0-windows\Трансформации.deps.json
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Трансформации\bin\Release\net9.0-windows\Трансформации.runtimeconfig.json
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Трансформации\bin\Release\net9.0-windows\Трансформации.dll
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Трансформации\bin\Release\net9.0-windows\Трансформации.pdb
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Трансформации\obj\Release\net9.0-windows\Трансформации.dll
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Трансформации\obj\Release\net9.0-windows\refint\Трансформации.dll
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Трансформации\obj\Release\net9.0-windows\Трансформации.pdb
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Трансформации\obj\Release\net9.0-windows\Трансформации.genruntimeconfig.cache
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Трансформации\obj\Release\net9.0-windows\ref\Трансформации.dll

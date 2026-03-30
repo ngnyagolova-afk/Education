@@ -1,0 +1,14 @@
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Билярд\obj\Release\net9.0-windows\Билярд.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Билярд\obj\Release\net9.0-windows\Билярд.AssemblyInfoInputs.cache
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Билярд\obj\Release\net9.0-windows\Билярд.AssemblyInfo.cs
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Билярд\obj\Release\net9.0-windows\Билярд.csproj.CoreCompileInputs.cache
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Билярд\bin\Release\net9.0-windows\Билярд.exe
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Билярд\bin\Release\net9.0-windows\Билярд.deps.json
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Билярд\bin\Release\net9.0-windows\Билярд.runtimeconfig.json
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Билярд\bin\Release\net9.0-windows\Билярд.dll
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Билярд\bin\Release\net9.0-windows\Билярд.pdb
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Билярд\obj\Release\net9.0-windows\Билярд.dll
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Билярд\obj\Release\net9.0-windows\refint\Билярд.dll
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Билярд\obj\Release\net9.0-windows\Билярд.pdb
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Билярд\obj\Release\net9.0-windows\Билярд.genruntimeconfig.cache
+C:\Users\Neli Nqgolova\Desktop\Вектори_Демо\Билярд\obj\Release\net9.0-windows\ref\Билярд.dll
