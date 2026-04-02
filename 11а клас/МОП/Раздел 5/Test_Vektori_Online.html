@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Тест: Вектори | МОП 11а клас</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-user-select: none; user-select: none; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0f1117; color: #e0e0e0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; }
+
+  .screen { display: none; width: 100%; max-width: 600px; }
+  .screen.active { display: block; }
+
+  /* ===== LOGIN ===== */
+  .login-card { background: #1a1d27; border-radius: 16px; padding: 36px 28px; box-shadow: 0 8px 40px rgba(0,0,0,0.5); text-align: center; }
+  .login-card h1 { font-size: 1.5rem; color: #7c8cf8; margin-bottom: 4px; }
+  .login-card .subtitle { font-size: 0.85rem; color: #888; margin-bottom: 28px; }
+  .login-card input { width: 100%; padding: 14px 16px; border-radius: 10px; border: 2px solid #2e3148; background: #12141e; color: #fff; font-size: 1rem; margin-bottom: 16px; outline: none; transition: border 0.2s; }
+  .login-card input:focus { border-color: #7c8cf8; }
+  .btn-primary { width: 100%; padding: 14px; border-radius: 10px; border: none; background: linear-gradient(135deg, #7c8cf8, #5b6cf9); color: #fff; font-size: 1.05rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+  .btn-primary:hover { opacity: 0.9; }
+  .rules { background: #12141e; border-radius: 10px; padding: 14px 16px; text-align: left; margin-bottom: 20px; font-size: 0.85rem; color: #aaa; line-height: 1.7; }
+  .rules b { color: #e0e0e0; }
+
+  /* ===== QUIZ ===== */
+  .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .quiz-info { font-size: 0.82rem; color: #888; }
+  .quiz-info span { color: #e0e0e0; font-weight: 600; }
+  .timer-wrap { text-align: right; }
+  .timer { font-size: 1.6rem; font-weight: 700; color: #7c8cf8; font-variant-numeric: tabular-nums; }
+  .timer.warning { color: #f97316; animation: pulse 1s infinite; }
+  .timer.danger  { color: #ef4444; animation: pulse 0.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+  .progress-bar { height: 6px; background: #2e3148; border-radius: 3px; margin-bottom: 20px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg,#7c8cf8,#5b6cf9); border-radius: 3px; transition: width 0.4s; }
+
+  .question-card { background: #1a1d27; border-radius: 16px; padding: 24px 20px; margin-bottom: 16px; }
+  .question-num { font-size: 0.78rem; color: #7c8cf8; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .question-text { font-size: 1.05rem; line-height: 1.6; color: #e8e8f0; }
+
+  .answers { display: flex; flex-direction: column; gap: 10px; }
+  .answer-btn { background: #12141e; border: 2px solid #2e3148; border-radius: 12px; padding: 14px 16px; text-align: left; color: #d0d0e0; font-size: 0.95rem; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 12px; }
+  .answer-btn:hover { border-color: #7c8cf8; background: #1c1f33; }
+  .answer-btn.selected { border-color: #7c8cf8; background: #1e2240; color: #fff; }
+  .answer-label { width: 28px; height: 28px; border-radius: 50%; background: #2e3148; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+  .answer-btn.selected .answer-label { background: #7c8cf8; color: #fff; }
+
+  .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; gap: 10px; }
+  .btn-nav { flex: 1; padding: 13px; border-radius: 10px; border: 2px solid #2e3148; background: transparent; color: #aaa; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
+  .btn-nav:hover { border-color: #7c8cf8; color: #fff; }
+  .btn-submit { flex: 1.5; padding: 13px; border-radius: 10px; border: none; background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff; font-size: 0.95rem; font-weight: 700; cursor: pointer; }
+  .btn-submit:disabled { background: #2e3148; color: #666; cursor: default; }
+
+  /* ===== WARNING OVERLAY ===== */
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 999; display: none; align-items: center; justify-content: center; }
+  .overlay.show { display: flex; }
+  .overlay-box { background: #1a1d27; border-radius: 16px; padding: 32px 24px; text-align: center; max-width: 340px; border: 2px solid #ef4444; }
+  .overlay-box .icon { font-size: 3rem; margin-bottom: 12px; }
+  .overlay-box h2 { color: #ef4444; margin-bottom: 8px; }
+  .overlay-box p { color: #aaa; font-size: 0.9rem; margin-bottom: 20px; line-height: 1.5; }
+  .btn-danger { width: 100%; padding: 13px; border-radius: 10px; border: none; background: #ef4444; color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; }
+
+  /* ===== RESULTS ===== */
+  .results-card { background: #1a1d27; border-radius: 16px; padding: 28px 22px; box-shadow: 0 8px 40px rgba(0,0,0,0.5); }
+  .results-card h2 { text-align: center; font-size: 1.3rem; color: #7c8cf8; margin-bottom: 4px; }
+  .student-name { text-align: center; font-size: 1rem; color: #aaa; margin-bottom: 20px; }
+  .score-circle { width: 110px; height: 110px; border-radius: 50%; margin: 0 auto 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; border: 5px solid; }
+  .score-circle .score-sub { font-size: 0.7rem; font-weight: 400; color: #aaa; }
+  .score-pass  { border-color: #22c55e; color: #22c55e; }
+  .score-fail  { border-color: #ef4444; color: #ef4444; }
+  .score-mid   { border-color: #f97316; color: #f97316; }
+
+  .cheat-badge { background: #3b0000; border: 1px solid #ef4444; border-radius: 8px; padding: 8px 12px; font-size: 0.8rem; color: #f87171; text-align: center; margin-bottom: 16px; }
+
+  .result-item { background: #12141e; border-radius: 10px; padding: 14px; margin-bottom: 10px; border-left: 4px solid; }
+  .result-item.correct { border-color: #22c55e; }
+  .result-item.wrong   { border-color: #ef4444; }
+  .result-item.skipped { border-color: #6b7280; }
+  .result-item .ri-q   { font-size: 0.85rem; color: #ccc; margin-bottom: 6px; line-height: 1.4; }
+  .result-item .ri-a   { font-size: 0.8rem; }
+  .ri-correct { color: #4ade80; }
+  .ri-wrong   { color: #f87171; }
+  .ri-skipped { color: #9ca3af; }
+
+  .meta-row { display: flex; gap: 10px; justify-content: center; margin: 16px 0; flex-wrap: wrap; }
+  .meta-chip { background: #12141e; border-radius: 20px; padding: 6px 14px; font-size: 0.8rem; color: #aaa; }
+  .meta-chip b { color: #e0e0e0; }
+
+  .btn-print { width: 100%; padding: 13px; border-radius: 10px; border: 2px solid #7c8cf8; background: transparent; color: #7c8cf8; font-size: 0.95rem; font-weight: 600; cursor: pointer; margin-top: 12px; }
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN SCREEN ============ -->
+<div id="screen-login" class="screen active">
+  <div class="login-card">
+    <h1>📐 Тест: Вектори</h1>
+    <div class="subtitle">МОП &nbsp;|&nbsp; 11а клас &nbsp;|&nbsp; Раздел 5</div>
+    <div class="rules">
+      <b>Правила:</b><br>
+      • 5 въпроса, избрани случайно от 10<br>
+      • Общо време: <b>5 минути</b><br>
+      • Отговорите са разбъркани<br>
+      • При излизане от прозореца → <b>предупреждение</b><br>
+      • При 3 предупреждения → <b>автоматично предаване</b><br>
+      • Не се позволява копиране на текст
+    </div>
+    <input type="text" id="studentName" placeholder="Въведи трите си имена" maxlength="60" autocomplete="off">
+    <button class="btn-primary" onclick="startTest()">Започни теста →</button>
+  </div>
+</div>
+
+<!-- ============ QUIZ SCREEN ============ -->
+<div id="screen-quiz" class="screen">
+  <div class="quiz-header">
+    <div class="quiz-info">Въпрос <span id="qNum">1</span> от <span id="qTotal">5</span></div>
+    <div class="timer-wrap">
+      <div class="timer" id="timer">05:00</div>
+    </div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  <div class="question-card">
+    <div class="question-num" id="qLabel">ВЪПРОС 1</div>
+    <div class="question-text" id="qText"></div>
+  </div>
+  <div class="answers" id="answersContainer"></div>
+  <div class="nav-row">
+    <button class="btn-nav" id="btnPrev" onclick="navigate(-1)">← Назад</button>
+    <button class="btn-nav" id="btnNext" onclick="navigate(1)">Напред →</button>
+    <button class="btn-submit" id="btnSubmit" onclick="confirmSubmit()">Предай теста ✓</button>
+  </div>
+</div>
+
+<!-- ============ RESULTS SCREEN ============ -->
+<div id="screen-results" class="screen">
+  <div class="results-card">
+    <h2>Резултати</h2>
+    <div class="student-name" id="resName"></div>
+    <div id="scoreCircle" class="score-circle"></div>
+    <div class="meta-row">
+      <div class="meta-chip">Верни: <b id="resCorrect">0</b></div>
+      <div class="meta-chip">Грешни: <b id="resWrong">0</b></div>
+      <div class="meta-chip">Пропуснати: <b id="resSkipped">0</b></div>
+      <div class="meta-chip">Предупреждения: <b id="resWarnings">0</b></div>
+      <div class="meta-chip">Време: <b id="resTime">—</b></div>
+    </div>
+    <div id="cheatBadge" class="cheat-badge" style="display:none">⚠️ Регистрирани са нарушения при полагане на теста</div>
+    <div id="resultsList"></div>
+    <button class="btn-print" onclick="window.print()">🖨️ Принтирай / Сподели резултата</button>
+  </div>
+</div>
+
+<!-- ============ WARNING OVERLAY ============ -->
+<div class="overlay" id="warnOverlay">
+  <div class="overlay-box">
+    <div class="icon">⚠️</div>
+    <h2>Напускане на прозореца!</h2>
+    <p id="warnMsg">Излизането от прозореца на теста е регистрирано.<br>При <b>3 нарушения</b> тестът ще бъде предаден автоматично.</p>
+    <button class="btn-danger" onclick="dismissWarning()">Разбрах — връщам се</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+//  ВЪПРОСИ И ОТГОВОРИ
+// ============================================================
+const ALL_QUESTIONS = [
+  {
+    text: "Дадени са точки A(3, 5) и B(8, 2). Какви са координатите на вектора AB⃗?",
+    answers: ["(5, −3)", "(−5, 3)", "(11, 7)", "(5, 7)"],
+    correct: 0,
+    explanation: "AB⃗ = (B.x−A.x, B.y−A.y) = (8−3, 2−5) = (5, −3)"
+  },
+  {
+    text: "Каква е дължината на вектора v⃗ = (3, 4)?",
+    answers: ["5", "7", "25", "√7"],
+    correct: 0,
+    explanation: "|v⃗| = √(3² + 4²) = √25 = 5"
+  },
+  {
+    text: "Намерете a⃗ + b⃗, ако a⃗ = (2, −1, 3) и b⃗ = (−1, 4, 2).",
+    answers: ["(1, 3, 5)", "(3, −5, 1)", "(1, 3, 1)", "(−2, −4, 6)"],
+    correct: 0,
+    explanation: "Събираме компонентно: (2−1, −1+4, 3+2) = (1, 3, 5)"
+  },
+  {
+    text: "Пресметнете 3 · v⃗, ако v⃗ = (2, −1, 4).",
+    answers: ["(6, −3, 12)", "(5, 2, 7)", "(6, −1, 4)", "(2, −3, 12)"],
+    correct: 0,
+    explanation: "3·(2, −1, 4) = (6, −3, 12)"
+  },
+  {
+    text: "Колко е скаларното произведение a⃗ · b⃗, ако a⃗ = (1, 2, 3) и b⃗ = (4, −1, 2)?",
+    answers: ["8", "12", "−8", "6"],
+    correct: 0,
+    explanation: "1·4 + 2·(−1) + 3·2 = 4 − 2 + 6 = 8"
+  },
+  {
+    text: "Кога два вектора са перпендикулярни (под ъгъл 90°)?",
+    answers: ["Dot product = 0", "Dot product > 0", "Cross product = 0", "Дължините им са равни"],
+    correct: 0,
+    explanation: "cos(90°) = 0 ⟹ dot product = 0"
+  },
+  {
+    text: "Dot product на a⃗ = (1, 0) и b⃗ = (−1, 0) е −1. Какво означава това?",
+    answers: ["Ъгълът е тъп (> 90°)", "Ъгълът е остър (< 90°)", "Векторите са перпендикулярни", "Векторите са равни"],
+    correct: 0,
+    explanation: "Dot product < 0 ⟹ cos(angle) < 0 ⟹ тъп ъгъл"
+  },
+  {
+    text: "Какво получаваме като резултат от векторното произведение (cross product)?",
+    answers: ["Нов вектор, перпендикулярен на двата", "Число (скалар)", "Сумата на двата вектора", "Ъгъла между тях"],
+    correct: 0,
+    explanation: "Cross product c⃗ = a⃗ × b⃗ е вектор перпендикулярен на равнината на a⃗ и b⃗"
+  },
+  {
+    text: "Коя матрица прилага ротация с ъгъл α в 2D?",
+    answers: ["[[cos α, −sin α], [sin α, cos α]]", "[[sin α, cos α], [cos α, −sin α]]", "[[cos α, sin α], [−sin α, cos α]]", "[[1, −α], [α, 1]]"],
+    correct: 0,
+    explanation: "x_new = cos(α)·x − sin(α)·y,  y_new = sin(α)·x + cos(α)·y"
+  },
+  {
+    text: "Как се пресмята дължина на вектор (x, y, z) в C#?",
+    answers: ["Math.Sqrt(x*x + y*y + z*z)", "x + y + z", "Math.Abs(x + y + z)", "Math.Pow(x*y*z, 1.0/3)"],
+    correct: 0,
+    explanation: "Теорема на Питагор в 3D: |v⃗| = √(x² + y² + z²)"
+  }
+];
+
+// ============================================================
+//  STATE
+// ============================================================
+let student = "";
+let questions = [];          // 5 selected + shuffled
+let answerMap = [];          // per question: {shuffledAnswers, correctShuffledIdx}
+let userAnswers = [];        // index of selected answer (or null)
+let currentQ = 0;
+let timerInterval = null;
+let secondsLeft = 300;       // 5 min
+let startTime = null;
+let warnings = 0;
+let submitted = false;
+let warningPending = false;
+const MAX_WARNINGS = 3;
+const QUESTIONS_COUNT = 5;
+
+// ============================================================
+//  UTILITY
+// ============================================================
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function pickQuestions() {
+  const shuffledAll = shuffle([...Array(ALL_QUESTIONS.length).keys()]);
+  const picked = shuffledAll.slice(0, QUESTIONS_COUNT);
+  questions = picked.map(i => ALL_QUESTIONS[i]);
+
+  answerMap = questions.map(q => {
+    // Create index pairs [answerText, originalIndex]
+    const indexed = q.answers.map((a, i) => ({ text: a, origIdx: i }));
+    const shuffled = shuffle(indexed);
+    const correctShuffledIdx = shuffled.findIndex(x => x.origIdx === q.correct);
+    return { shuffledAnswers: shuffled.map(x => x.text), correctShuffledIdx };
+  });
+
+  userAnswers = Array(QUESTIONS_COUNT).fill(null);
+}
+
+function formatTime(s) {
+  const m = Math.floor(s / 60).toString().padStart(2, '0');
+  const ss = (s % 60).toString().padStart(2, '0');
+  return `${m}:${ss}`;
+}
+
+// ============================================================
+//  START
+// ============================================================
+function startTest() {
+  student = document.getElementById('studentName').value.trim();
+  if (!student) { alert('Моля, въведи трите си имена!'); return; }
+
+  pickQuestions();
+  startTime = new Date();
+  showScreen('quiz');
+  renderQuestion();
+  startTimer();
+  setupAntiCheat();
+}
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+}
+
+// ============================================================
+//  TIMER
+// ============================================================
+function startTimer() {
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    secondsLeft--;
+    updateTimerDisplay();
+    if (secondsLeft <= 0) {
+      clearInterval(timerInterval);
+      submitTest(true);
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('timer');
+  el.textContent = formatTime(secondsLeft);
+  el.className = 'timer';
+  if (secondsLeft <= 60) el.classList.add('danger');
+  else if (secondsLeft <= 120) el.classList.add('warning');
+}
+
+// ============================================================
+//  RENDER QUESTION
+// ============================================================
+function renderQuestion() {
+  const q = questions[currentQ];
+  const map = answerMap[currentQ];
+
+  document.getElementById('qNum').textContent = currentQ + 1;
+  document.getElementById('qTotal').textContent = QUESTIONS_COUNT;
+  document.getElementById('qLabel').textContent = `ВЪПРОС ${currentQ + 1}`;
+  document.getElementById('qText').textContent = q.text;
+
+  const progress = ((currentQ) / QUESTIONS_COUNT) * 100;
+  document.getElementById('progressFill').style.width = progress + '%';
+
+  const container = document.getElementById('answersContainer');
+  container.innerHTML = '';
+  const labels = ['А', 'Б', 'В', 'Г'];
+
+  map.shuffledAnswers.forEach((ans, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn' + (userAnswers[currentQ] === i ? ' selected' : '');
+    btn.innerHTML = `<span class="answer-label">${labels[i]}</span><span>${ans}</span>`;
+    btn.onclick = () => selectAnswer(i);
+    container.appendChild(btn);
+  });
+
+  document.getElementById('btnPrev').style.visibility = currentQ === 0 ? 'hidden' : 'visible';
+  document.getElementById('btnNext').style.display = currentQ === QUESTIONS_COUNT - 1 ? 'none' : 'block';
+  document.getElementById('btnSubmit').style.display = currentQ === QUESTIONS_COUNT - 1 ? 'block' : 'none';
+}
+
+function selectAnswer(idx) {
+  userAnswers[currentQ] = idx;
+  renderQuestion();
+}
+
+function navigate(dir) {
+  currentQ = Math.max(0, Math.min(QUESTIONS_COUNT - 1, currentQ + dir));
+  renderQuestion();
+}
+
+// ============================================================
+//  SUBMIT
+// ============================================================
+function confirmSubmit() {
+  const answered = userAnswers.filter(a => a !== null).length;
+  if (answered < QUESTIONS_COUNT) {
+    if (!confirm(`Имаш ${QUESTIONS_COUNT - answered} неотговорен(и) въпрос(а). Сигурен ли си, че искаш да предадеш?`)) return;
+  }
+  submitTest(false);
+}
+
+function submitTest(autoSubmit) {
+  if (submitted) return;
+  submitted = true;
+  clearInterval(timerInterval);
+
+  const elapsed = Math.round((new Date() - startTime) / 1000);
+  const timeSpent = formatTime(elapsed);
+
+  let correct = 0, wrong = 0, skipped = 0;
+  const resultDetails = [];
+
+  questions.forEach((q, i) => {
+    const map = answerMap[i];
+    const userIdx = userAnswers[i];
+    const isCorrect = userIdx === map.correctShuffledIdx;
+    const isSkipped = userIdx === null;
+
+    if (isSkipped) skipped++;
+    else if (isCorrect) correct++;
+    else wrong++;
+
+    resultDetails.push({
+      qText: q.text,
+      userAnswer: isSkipped ? null : map.shuffledAnswers[userIdx],
+      correctAnswer: map.shuffledAnswers[map.correctShuffledIdx],
+      isCorrect,
+      isSkipped,
+      explanation: q.explanation
+    });
+  });
+
+  showResults(correct, wrong, skipped, timeSpent, resultDetails, autoSubmit);
+}
+
+// ============================================================
+//  RESULTS
+// ============================================================
+function showResults(correct, wrong, skipped, timeSpent, details, autoSubmit) {
+  showScreen('results');
+
+  document.getElementById('resName').textContent = student;
+  document.getElementById('resCorrect').textContent = correct;
+  document.getElementById('resWrong').textContent = wrong;
+  document.getElementById('resSkipped').textContent = skipped;
+  document.getElementById('resWarnings').textContent = warnings;
+  document.getElementById('resTime').textContent = timeSpent;
+
+  const pct = Math.round((correct / QUESTIONS_COUNT) * 100);
+  const circle = document.getElementById('scoreCircle');
+  let cls = pct >= 70 ? 'score-pass' : pct >= 50 ? 'score-mid' : 'score-fail';
+  circle.className = `score-circle ${cls}`;
+  circle.innerHTML = `${correct}/${QUESTIONS_COUNT}<div class="score-sub">${pct}%</div>`;
+
+  if (warnings > 0 || autoSubmit) {
+    const badge = document.getElementById('cheatBadge');
+    badge.style.display = 'block';
+    let msg = '⚠️ ';
+    if (autoSubmit && secondsLeft <= 0) msg += 'Тестът е предаден автоматично при изтичане на времето.';
+    else if (autoSubmit) msg += 'Тестът е предаден автоматично поради нарушения.';
+    if (warnings > 0) msg += ` Регистрирани са ${warnings} напускане(ия) на прозореца.`;
+    badge.textContent = msg;
+  }
+
+  const list = document.getElementById('resultsList');
+  list.innerHTML = '';
+  details.forEach((d, i) => {
+    const div = document.createElement('div');
+    div.className = 'result-item ' + (d.isSkipped ? 'skipped' : d.isCorrect ? 'correct' : 'wrong');
+    div.innerHTML = `
+      <div class="ri-q"><b>В${i+1}.</b> ${d.qText}</div>
+      ${d.isSkipped
+        ? `<div class="ri-a ri-skipped">— Пропуснат</div>`
+        : d.isCorrect
+          ? `<div class="ri-a ri-correct">✔ ${d.userAnswer}</div>`
+          : `<div class="ri-a ri-wrong">✘ Твой: ${d.userAnswer}</div>
+             <div class="ri-a ri-correct">✔ Верен: ${d.correctAnswer}</div>`
+      }
+      <div class="ri-a" style="color:#6b7280;font-size:0.75rem;margin-top:4px">${d.explanation}</div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+// ============================================================
+//  ANTI-CHEAT
+// ============================================================
+function setupAntiCheat() {
+  // Tab / window switch
+  document.addEventListener('visibilitychange', onVisChange);
+  window.addEventListener('blur', onBlur);
+
+  // Disable right-click
+  document.addEventListener('contextmenu', e => e.preventDefault());
+
+  // Disable copy / cut / paste
+  document.addEventListener('copy',  e => e.preventDefault());
+  document.addEventListener('cut',   e => e.preventDefault());
+  document.addEventListener('paste', e => e.preventDefault());
+
+  // Disable keyboard shortcuts
+  document.addEventListener('keydown', e => {
+    // Block Ctrl+C, Ctrl+V, Ctrl+U, F12, Ctrl+Shift+I
+    if (e.ctrlKey && ['c','v','u','s','a'].includes(e.key.toLowerCase())) e.preventDefault();
+    if (e.key === 'F12') e.preventDefault();
+    if (e.ctrlKey && e.shiftKey && ['i','j','c'].includes(e.key.toLowerCase())) e.preventDefault();
+  });
+}
+
+let blurTimeout = null;
+let visChangeTimeout = null;
+
+function onBlur() {
+  if (submitted || warningPending) return;
+  blurTimeout = setTimeout(() => triggerWarning('blur'), 400);
+}
+
+function onVisChange() {
+  if (submitted || warningPending) return;
+  if (document.hidden) {
+    visChangeTimeout = setTimeout(() => triggerWarning('vis'), 400);
+  }
+}
+
+function triggerWarning(source) {
+  if (submitted || warningPending) return;
+  warningPending = true;
+  warnings++;
+
+  const msg = document.getElementById('warnMsg');
+  if (warnings >= MAX_WARNINGS) {
+    msg.innerHTML = `<b>Регистрирани са ${warnings} нарушения!</b><br>Тестът ще бъде предаден автоматично.`;
+    document.getElementById('warnOverlay').classList.add('show');
+    setTimeout(() => { dismissWarning(); submitTest(true); }, 3000);
+  } else {
+    msg.innerHTML = `Излизането от прозореца е регистрирано.<br>Нарушение <b>${warnings} от ${MAX_WARNINGS}</b>.<br>При ${MAX_WARNINGS} нарушения тестът се предава автоматично.`;
+    document.getElementById('warnOverlay').classList.add('show');
+  }
+}
+
+function dismissWarning() {
+  document.getElementById('warnOverlay').classList.remove('show');
+  warningPending = false;
+}
+
+// Focus back — clear pending timeouts
+window.addEventListener('focus', () => {
+  clearTimeout(blurTimeout);
+  clearTimeout(visChangeTimeout);
+});
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    clearTimeout(visChangeTimeout);
+  }
+});
+
+// Enter key on login
+document.getElementById('studentName').addEventListener('keydown', e => {
+  if (e.key === 'Enter') startTest();
+});
+</script>
+</body>
+</html>
