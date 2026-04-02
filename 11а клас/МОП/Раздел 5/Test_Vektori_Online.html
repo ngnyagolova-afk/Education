@@ -103,7 +103,7 @@
       • Общо време: <b>5 минути</b><br>
       • Отговорите са разбъркани<br>
       • При излизане от прозореца → <b>предупреждение</b><br>
-      • При 3 предупреждения → <b>автоматично предаване</b><br>
+      • При напускане на прозореца → <b>автоматично предаване</b><br>
       • Не се позволява копиране на текст
     </div>
     <input type="text" id="studentName" placeholder="Въведи трите си имена" maxlength="60" autocomplete="off">
@@ -242,7 +242,7 @@ let startTime = null;
 let warnings = 0;
 let submitted = false;
 let warningPending = false;
-const MAX_WARNINGS = 3;
+const MAX_WARNINGS = 1;
 const QUESTIONS_COUNT = 5;
 
 // ============================================================
@@ -406,6 +406,7 @@ function submitTest(autoSubmit) {
     });
   });
 
+  sendToSheets(correct, wrong, skipped, timeSpent, autoSubmit);
   showResults(correct, wrong, skipped, timeSpent, resultDetails, autoSubmit);
 }
 
@@ -439,6 +440,41 @@ function showResults(correct, wrong, skipped, timeSpent, details, autoSubmit) {
 
   const list = document.getElementById('resultsList');
   list.innerHTML = '';
+}
+
+// ============================================================
+//  GOOGLE SHEETS
+// ============================================================
+const APPS_SCRIPT_URL = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE';
+
+function sendToSheets(correct, wrong, skipped, timeSpent, autoSubmit) {
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.startsWith('PASTE')) return;
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('bg-BG');
+  const timeStr = now.toLocaleTimeString('bg-BG');
+  const pct = Math.round((correct / QUESTIONS_COUNT) * 100);
+  const reason = autoSubmit && secondsLeft <= 0 ? 'Изтекло време'
+               : autoSubmit ? 'Напускане на прозорец'
+               : 'Предаден от ученик';
+
+  const data = {
+    name: student,
+    date: dateStr,
+    time: timeStr,
+    correct,
+    total: QUESTIONS_COUNT,
+    percent: pct,
+    timeSpent,
+    warnings,
+    submitReason: reason
+  };
+
+  fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).catch(() => {});
 }
 
 // ============================================================
@@ -487,14 +523,9 @@ function triggerWarning(source) {
   warnings++;
 
   const msg = document.getElementById('warnMsg');
-  if (warnings >= MAX_WARNINGS) {
-    msg.innerHTML = `<b>Регистрирани са ${warnings} нарушения!</b><br>Тестът ще бъде предаден автоматично.`;
-    document.getElementById('warnOverlay').classList.add('show');
-    setTimeout(() => { dismissWarning(); submitTest(true); }, 3000);
-  } else {
-    msg.innerHTML = `Излизането от прозореца е регистрирано.<br>Нарушение <b>${warnings} от ${MAX_WARNINGS}</b>.<br>При ${MAX_WARNINGS} нарушения тестът се предава автоматично.`;
-    document.getElementById('warnOverlay').classList.add('show');
-  }
+  msg.innerHTML = `<b>Регистрирано е напускане на прозореца!</b><br>Тестът ще бъде предаден автоматично.`;
+  document.getElementById('warnOverlay').classList.add('show');
+  setTimeout(() => { dismissWarning(); submitTest(true); }, 3000);
 }
 
 function dismissWarning() {
