@@ -469,12 +469,18 @@ function sendToSheets(correct, wrong, skipped, timeSpent, autoSubmit) {
     submitReason: reason
   };
 
-  fetch(APPS_SCRIPT_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  }).catch(() => {});
+  const params = new URLSearchParams({
+    name:         data.name,
+    date:         data.date,
+    time:         data.time,
+    correct:      data.correct,
+    total:        data.total,
+    percent:      data.percent,
+    timeSpent:    data.timeSpent,
+    warnings:     data.warnings,
+    submitReason: data.submitReason
+  });
+  fetch(APPS_SCRIPT_URL + '?' + params.toString(), { method: 'GET', mode: 'no-cors' }).catch(() => {});
 }
 
 // ============================================================
