@@ -469,10 +469,11 @@ function sendToSheets(correct, wrong, skipped, timeSpent, autoSubmit) {
     submitReason: reason
   };
 
-  // Base64 encode to safely transmit Cyrillic
+  // Use Image() — bypasses CORS/redirects, works with Apps Script
   const json = JSON.stringify(data);
   const b64 = btoa(unescape(encodeURIComponent(json)));
-  fetch(APPS_SCRIPT_URL + '?b=' + b64, { method: 'GET', mode: 'no-cors' }).catch(() => {});
+  const img = new Image();
+  img.src = APPS_SCRIPT_URL + '?b=' + b64;
 }
 
 // ============================================================
