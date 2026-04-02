@@ -445,7 +445,7 @@ function showResults(correct, wrong, skipped, timeSpent, details, autoSubmit) {
 // ============================================================
 //  GOOGLE SHEETS
 // ============================================================
-const APPS_SCRIPT_URL = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4lz8UlpBqirRuf48wvUF2CZItTv_bA4QTraukovcHQb6k9zpQVjCMj_Gphan2HMu4/exec';
 
 function sendToSheets(correct, wrong, skipped, timeSpent, autoSubmit) {
   if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.startsWith('PASTE')) return;
