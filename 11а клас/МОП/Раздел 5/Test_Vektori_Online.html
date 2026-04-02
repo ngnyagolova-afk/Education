@@ -139,11 +139,11 @@
     <div class="student-name" id="resName"></div>
     <div id="scoreCircle" class="score-circle"></div>
     <div class="meta-row">
-      <div class="meta-chip">Верни: <b id="resCorrect">0</b></div>
-      <div class="meta-chip">Грешни: <b id="resWrong">0</b></div>
-      <div class="meta-chip">Пропуснати: <b id="resSkipped">0</b></div>
       <div class="meta-chip">Предупреждения: <b id="resWarnings">0</b></div>
       <div class="meta-chip">Време: <b id="resTime">—</b></div>
+    </div>
+    <div style="text-align:center;font-size:1rem;color:#aaa;margin-bottom:16px">
+      Верни отговори: <b id="resCorrect" style="color:#e0e0e0;font-size:1.1rem"></b> от <b style="color:#e0e0e0"id="resTotalQ"></b>
     </div>
     <div id="cheatBadge" class="cheat-badge" style="display:none">⚠️ Регистрирани са нарушения при полагане на теста</div>
     <div id="resultsList"></div>
@@ -417,8 +417,7 @@ function showResults(correct, wrong, skipped, timeSpent, details, autoSubmit) {
 
   document.getElementById('resName').textContent = student;
   document.getElementById('resCorrect').textContent = correct;
-  document.getElementById('resWrong').textContent = wrong;
-  document.getElementById('resSkipped').textContent = skipped;
+  document.getElementById('resTotalQ').textContent = QUESTIONS_COUNT;
   document.getElementById('resWarnings').textContent = warnings;
   document.getElementById('resTime').textContent = timeSpent;
 
@@ -440,22 +439,6 @@ function showResults(correct, wrong, skipped, timeSpent, details, autoSubmit) {
 
   const list = document.getElementById('resultsList');
   list.innerHTML = '';
-  details.forEach((d, i) => {
-    const div = document.createElement('div');
-    div.className = 'result-item ' + (d.isSkipped ? 'skipped' : d.isCorrect ? 'correct' : 'wrong');
-    div.innerHTML = `
-      <div class="ri-q"><b>В${i+1}.</b> ${d.qText}</div>
-      ${d.isSkipped
-        ? `<div class="ri-a ri-skipped">— Пропуснат</div>`
-        : d.isCorrect
-          ? `<div class="ri-a ri-correct">✔ ${d.userAnswer}</div>`
-          : `<div class="ri-a ri-wrong">✘ Твой: ${d.userAnswer}</div>
-             <div class="ri-a ri-correct">✔ Верен: ${d.correctAnswer}</div>`
-      }
-      <div class="ri-a" style="color:#6b7280;font-size:0.75rem;margin-top:4px">${d.explanation}</div>
-    `;
-    list.appendChild(div);
-  });
 }
 
 // ============================================================
