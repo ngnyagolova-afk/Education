@@ -1,0 +1,52 @@
+ИНСТРУКЦИИ ЗА СВЪРЗВАНЕ С GOOGLE SHEETS
+========================================
+
+Стъпка 1: Отвори Google Sheet-а
+  https://docs.google.com/spreadsheets/d/1m56LTP-i2l-zh-VjeLZ6B0ImZuxKUS5-BqVnzLPXhLQ/edit
+
+Стъпка 2: Добави заглавия в ред 1 (ако ги няма):
+  A1: Дата
+  B1: Час
+  C1: Три имена
+  D1: Верни
+  E1: Общо
+  F1: %
+  G1: Време за решаване
+  H1: Предупреждения
+  I1: Начин на предаване
+
+Стъпка 3: Отвори Apps Script
+  В менюто на Sheet-а: Разширения → Apps Script
+
+Стъпка 4: Изтрий всичко в редактора и постави следния код:
+--------------------------------------------------------------
+function doPost(e) {
+  var sheet = SpreadsheetApp.openById('1m56LTP-i2l-zh-VjeLZ6B0ImZuxKUS5-BqVnzLPXhLQ').getActiveSheet();
+  var data = JSON.parse(e.postData.contents);
+  sheet.appendRow([
+    data.date,
+    data.time,
+    data.name,
+    data.correct,
+    data.total,
+    data.percent + '%',
+    data.timeSpent,
+    data.warnings,
+    data.submitReason
+  ]);
+  return ContentService.createTextOutput('OK');
+}
+--------------------------------------------------------------
+
+Стъпка 5: Запази (Ctrl+S) и кликни "Deploy" → "New deployment"
+  - Тип: Web app
+  - Execute as: Me
+  - Who has access: Anyone
+  - Кликни "Deploy"
+  - Копирай URL-а (изглежда като: https://script.google.com/macros/s/AKfy.../exec)
+
+Стъпка 6: Отвори Test_Vektori_Online.html и намери реда:
+  const APPS_SCRIPT_URL = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE';
+  Замени 'PASTE_YOUR_APPS_SCRIPT_URL_HERE' с URL-а от стъпка 5.
+
+Стъпка 7: Качи обновения HTML в GitHub (или кажи на Claude да го направи).
