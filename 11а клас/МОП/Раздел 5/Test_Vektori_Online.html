@@ -469,20 +469,10 @@ function sendToSheets(correct, wrong, skipped, timeSpent, autoSubmit) {
     submitReason: reason
   };
 
-  // Encode as base64 to avoid Cyrillic corruption in URL
-  const payload = [
-    data.date,
-    data.time,
-    data.name,
-    data.correct,
-    data.total,
-    data.percent + '%',
-    data.timeSpent,
-    data.warnings,
-    data.submitReason
-  ].map(v => encodeURIComponent(String(v))).join('|');
-
-  fetch(APPS_SCRIPT_URL + '?data=' + encodeURIComponent(payload), { method: 'GET', mode: 'no-cors' }).catch(() => {});
+  // Base64 encode to safely transmit Cyrillic
+  const json = JSON.stringify(data);
+  const b64 = btoa(unescape(encodeURIComponent(json)));
+  fetch(APPS_SCRIPT_URL + '?b=' + b64, { method: 'GET', mode: 'no-cors' }).catch(() => {});
 }
 
 // ============================================================
