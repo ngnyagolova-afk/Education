@@ -469,15 +469,18 @@ function sendToSheets(correct, wrong, skipped, timeSpent, autoSubmit) {
     submitReason: reason
   };
 
-  // Unicode-safe base64 via TextEncoder (работи с кирилица)
+  // JSONP — единственото надеждно решение за Apps Script от статични страници
   const json = JSON.stringify(data);
   const bytes = new TextEncoder().encode(json);
   let binary = '';
   bytes.forEach(b => binary += String.fromCharCode(b));
   const b64 = btoa(binary);
-  const img = new Image();
-  img.src = APPS_SCRIPT_URL + '?b=' + b64;
+  const script = document.createElement('script');
+  script.src = APPS_SCRIPT_URL + '?b=' + b64 + '&callback=onSheetsDone';
+  document.body.appendChild(script);
 }
+
+function onSheetsDone(msg) { /* успешно записано */ }
 
 // ============================================================
 //  ANTI-CHEAT
