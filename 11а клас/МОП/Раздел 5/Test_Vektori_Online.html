@@ -445,7 +445,7 @@ function showResults(correct, wrong, skipped, timeSpent, details, autoSubmit) {
 // ============================================================
 //  GOOGLE SHEETS
 // ============================================================
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyUKLypbN7qSlPG3tgSZ4TGYGIRQlw33mxBBsSBeubJPSWKbd-PpytjfhzhQVC7OuwL/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzXVnRJAkq09Mgm_xFgNV1ONOWNCZBzUZG-LFFZQnyff5ag-RFbuHFVrdexLmERbFAX/exec';
 
 function sendToSheets(correct, wrong, skipped, timeSpent, autoSubmit) {
   if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.startsWith('PASTE')) return;
@@ -469,18 +469,20 @@ function sendToSheets(correct, wrong, skipped, timeSpent, autoSubmit) {
     submitReason: reason
   };
 
-  const params = new URLSearchParams({
-    name:         data.name,
-    date:         data.date,
-    time:         data.time,
-    correct:      data.correct,
-    total:        data.total,
-    percent:      data.percent,
-    timeSpent:    data.timeSpent,
-    warnings:     data.warnings,
-    submitReason: data.submitReason
-  });
-  fetch(APPS_SCRIPT_URL + '?' + params.toString(), { method: 'GET', mode: 'no-cors' }).catch(() => {});
+  // Encode as base64 to avoid Cyrillic corruption in URL
+  const payload = [
+    data.date,
+    data.time,
+    data.name,
+    data.correct,
+    data.total,
+    data.percent + '%',
+    data.timeSpent,
+    data.warnings,
+    data.submitReason
+  ].map(v => encodeURIComponent(String(v))).join('|');
+
+  fetch(APPS_SCRIPT_URL + '?data=' + encodeURIComponent(payload), { method: 'GET', mode: 'no-cors' }).catch(() => {});
 }
 
 // ============================================================
