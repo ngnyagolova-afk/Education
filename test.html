@@ -325,6 +325,7 @@
   <div class="card">
     <div class="score-circle" id="score-circle"></div>
     <div class="result-name" id="result-name"></div>
+    <div id="force-warning" style="display:none;background:#c0392b;color:white;border-radius:10px;padding:10px 14px;margin:10px 0;font-weight:bold;font-size:0.95rem;text-align:center;"></div>
     <div class="result-sub" id="result-sub"></div>
   </div>
   <div id="review-list"></div>
@@ -545,6 +546,7 @@ let answers   = [];   // избрания индекс на отговор (в �
 let timerInt  = null;
 let timeLeft  = TOTAL_TIME;
 let studentName = '';
+let quizActive  = false;  // true докато тестът се решава
 
 /* ── Fisher-Yates shuffle ── */
 function shuffle(arr) {
@@ -572,6 +574,7 @@ function startQuiz() {
   // Разбъркваме отговорите за всеки въпрос
   optOrder = questions.map(q => shuffle([...Array(q.opts.length).keys()]));
 
+  quizActive = true;
   showScreen('quiz');
   startTimer();
   showQuestion(0);
@@ -654,7 +657,9 @@ function nextQuestion() {
 }
 
 /* ── Резултати ── */
-function finishQuiz() {
+function finishQuiz(forceMsg) {
+  if (!quizActive && !forceMsg) return;  // предотвратява двойно извикване
+  quizActive = false;
   clearInterval(timerInt);
   document.getElementById('timer').textContent = '✓';
 
@@ -677,9 +682,18 @@ function finishQuiz() {
   circle.innerHTML = correct + '/' + questions.length + '<br><small>Оценка: ' + grade + '</small>';
 
   document.getElementById('result-name').textContent = studentName;
-  document.getElementById('result-sub').textContent =
-    'Верни отговори: ' + correct + ' от ' + questions.length +
+
+  let subText = 'Верни отговори: ' + correct + ' от ' + questions.length +
     ' (' + Math.round(pct * 100) + '%)';
+  if (forceMsg) subText = forceMsg + '\n' + subText;
+  document.getElementById('result-sub').textContent = subText;
+
+  // Предупреждение при принудително предаване
+  const warnEl = document.getElementById('force-warning');
+  if (warnEl) {
+    warnEl.style.display = forceMsg ? 'block' : 'none';
+    if (forceMsg) warnEl.textContent = forceMsg;
+  }
 
   // Преглед на отговорите
   const list = document.getElementById('review-list');
@@ -709,6 +723,48 @@ function finishQuiz() {
   // Финален прогрес бар
   document.getElementById('progress-bar').style.width = '100%';
   showScreen('result');
+
+  // ── Изпращане на резултатите по имейл ──
+  sendResults({ studentName, correct, total: questions.length, grade, pct, forceMsg });
+}
+
+function sendResults({ studentName, correct, total, grade, pct, forceMsg }) {
+  // Изграждаме текст с всички отговори
+  let detailLines = questions.map((q, i) => {
+    const isOk = answers[i] === q.correct;
+    const given = answers[i] >= 0 ? q.opts[answers[i]] : '(без отговор)';
+    const right = q.opts[q.correct];
+    return (isOk ? '✔' : '✘') + ' В' + (i+1) + ': ' + q.q +
+      '\n   Отговор: ' + given + (isOk ? '' : '\n   Верен: ' + right);
+  }).join('\n\n');
+
+  const now = new Date().toLocaleString('bg-BG', { timeZone: 'Europe/Sofia' });
+  const forced = forceMsg ? '\n⚠️ ПРИНУДИТЕЛНО ПРЕДАВАНЕ: ' + forceMsg + '\n' : '';
+
+  const body =
+    'Ученик: ' + studentName + '\n' +
+    'Дата/час: ' + now + '\n' +
+    'Резултат: ' + correct + '/' + total + ' (' + Math.round(pct * 100) + '%)' + '\n' +
+    'Оценка: ' + grade + '\n' +
+    forced +
+    '\n──────────────────────\n' +
+    detailLines;
+
+  // Изпращаме чрез FormSubmit (без backend — само email)
+  fetch('https://formsubmit.co/ajax/ngnyagolova@gmail.com', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({
+      _subject: '📝 Тест Раздел 8 — ' + studentName + ' — Оценка ' + grade,
+      _template: 'box',
+      _captcha: 'false',
+      Ученик: studentName,
+      Резултат: correct + '/' + total + ' — Оценка ' + grade,
+      Дата: now,
+      Принудително: forceMsg || 'не',
+      Отговори: detailLines
+    })
+  }).catch(() => {}); // тихо — не спира теста при грешка в мрежата
 }
 
 /* Блокиране на назад бутона на браузъра */
@@ -717,7 +773,20 @@ window.addEventListener('popstate', () => {
   history.pushState(null, '', location.href);
 });
 
-/* Фокус на полето за име при зареждане */
+/* ── Защита при напускане на екрана ── */
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden' && quizActive) {
+    finishQuiz('⚠️ Напуснахте екрана — тестът е предаден автоматично!');
+  }
+});
+
+window.addEventListener('blur', () => {
+  if (quizActive) {
+    finishQuiz('⚠️ Напуснахте прозореца — тестът е предаден автоматично!');
+  }
+});
+
+/* Фокус на полето за ime при зареждане */
 window.addEventListener('load', () => {
   setTimeout(() => document.getElementById('student-name').focus(), 300);
 });
