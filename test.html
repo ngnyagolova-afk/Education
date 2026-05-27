@@ -684,13 +684,14 @@ function finishQuiz(forceMsg) {
     if (answers[i] === q.correct) correct++;
   });
 
-  const pct   = correct / questions.length;
+  const pct = correct / questions.length;
+  // Скала: 20 въпроса × 1 т.  →  2(0-9) | 3(10-12) | 4(13-15) | 5(16-18) | 6(19-20)
   let grade, gradeClass;
-  if      (pct >= 0.90) { grade = 6; gradeClass = 'grade-6'; }
-  else if (pct >= 0.75) { grade = 5; gradeClass = 'grade-5'; }
-  else if (pct >= 0.60) { grade = 4; gradeClass = 'grade-4'; }
-  else if (pct >= 0.50) { grade = 3; gradeClass = 'grade-3'; }
-  else                  { grade = 2; gradeClass = 'grade-2'; }
+  if      (correct >= 19) { grade = 6; gradeClass = 'grade-6'; }
+  else if (correct >= 16) { grade = 5; gradeClass = 'grade-5'; }
+  else if (correct >= 13) { grade = 4; gradeClass = 'grade-4'; }
+  else if (correct >= 10) { grade = 3; gradeClass = 'grade-3'; }
+  else                    { grade = 2; gradeClass = 'grade-2'; }
 
   const circle = document.getElementById('score-circle');
   circle.className = 'score-circle ' + gradeClass;
