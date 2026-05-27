@@ -254,26 +254,41 @@
     margin-bottom: 20px;
   }
 
-  .review-item {
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin-bottom: 10px;
+  /* Преглед — само точки */
+  #review-list {
+    background: white;
+    border-radius: 16px;
+    padding: 18px 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    margin-bottom: 16px;
+  }
+  #review-list h3 {
+    text-align: center;
     font-size: 0.88rem;
-    line-height: 1.45;
+    color: #888;
+    margin-bottom: 14px;
+    font-weight: 500;
   }
-  .review-item.correct {
-    background: #eafaf1;
-    border-left: 4px solid #27ae60;
+  .dots-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
   }
-  .review-item.wrong {
-    background: #fdf0ed;
-    border-left: 4px solid #e74c3c;
+  .dot-item {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: white;
   }
-  .review-item .ri-q { font-weight: 600; margin-bottom: 5px; color: #1a1a2e; }
-  .review-item .ri-ans { font-size: 0.82rem; }
-  .review-item .ri-ans .lbl { font-weight: 600; }
-  .correct-lbl { color: #27ae60; }
-  .wrong-lbl   { color: #e74c3c; }
+  .dot-item.correct { background: #27ae60; }
+  .dot-item.wrong   { background: #e74c3c; }
+  .dot-item.skipped { background: #bbb; }
 
   footer {
     text-align: center;
@@ -695,29 +710,19 @@ function finishQuiz(forceMsg) {
     if (forceMsg) warnEl.textContent = forceMsg;
   }
 
-  // Преглед на отговорите
+  // Преглед — само цветни точки с номер
   const list = document.getElementById('review-list');
-  list.innerHTML = '';
+  list.innerHTML = '<h3>Преглед на отговорите</h3><div class="dots-grid"></div>';
+  const grid = list.querySelector('.dots-grid');
   questions.forEach((q, i) => {
-    const isCorrect = answers[i] === q.correct;
-    const div = document.createElement('div');
-    div.className = 'review-item ' + (isCorrect ? 'correct' : 'wrong');
-
-    const yourAns = answers[i] >= 0
-      ? q.opts[answers[i]]
-      : '(без отговор)';
-    const corrAns = q.opts[q.correct];
-
-    let html = `<div class="ri-q">${i+1}. ${q.q}</div><div class="ri-ans">`;
-    if (isCorrect) {
-      html += `<span class="lbl correct-lbl">✔ Верно:</span> ${corrAns}`;
+    const dot = document.createElement('div');
+    if (answers[i] < 0) {
+      dot.className = 'dot-item skipped';
     } else {
-      html += `<span class="lbl wrong-lbl">✘ Твоят отговор:</span> ${yourAns}<br>`;
-      html += `<span class="lbl correct-lbl">✔ Верен отговор:</span> ${corrAns}`;
+      dot.className = 'dot-item ' + (answers[i] === q.correct ? 'correct' : 'wrong');
     }
-    html += '</div>';
-    div.innerHTML = html;
-    list.appendChild(div);
+    dot.textContent = i + 1;
+    grid.appendChild(dot);
   });
 
   // Финален прогрес бар
@@ -774,16 +779,28 @@ window.addEventListener('popstate', () => {
 });
 
 /* ── Защита при напускане на екрана ── */
+let _leftDuringQuiz = false;
+
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden' && quizActive) {
-    finishQuiz('⚠️ Напуснахте екрана — тестът е предаден автоматично!');
+  if (document.hidden) {
+    // Страницата стана скрита (смяна на таб/приложение/заключен екран)
+    if (quizActive) {
+      _leftDuringQuiz = true;
+      finishQuiz('⚠️ Напуснахте екрана — тестът е предаден автоматично!');
+    }
+  } else {
+    // Страницата се върна на преден план — ако сме отбелязали напускане, предаваме
+    if (_leftDuringQuiz && quizActive) {
+      _leftDuringQuiz = false;
+      finishQuiz('⚠️ Напуснахте екрана — тестът е предаден автоматично!');
+    }
+    _leftDuringQuiz = false;
   }
 });
 
-window.addEventListener('blur', () => {
-  if (quizActive) {
-    finishQuiz('⚠️ Напуснахте прозореца — тестът е предаден автоматично!');
-  }
+// Fallback: при навигация от страницата (back/forward/close)
+window.addEventListener('pagehide', () => {
+  if (quizActive) finishQuiz('⚠️ Напуснахте страницата — тестът е предаден автоматично!');
 });
 
 /* Фокус на полето за ime при зареждане */
