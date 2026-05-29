@@ -322,10 +322,11 @@ let placed = {};        // blankId → word
 let dragWord = null;    // думата, която се влачи
 
 function init() {
-  // Думи
+  // Думи — разбъркани
   const wc = document.getElementById('words-container');
   wc.innerHTML = '';
-  WORDS.forEach(w => {
+  const shuffled = [...WORDS].sort(() => Math.random() - 0.5);
+  shuffled.forEach(w => {
     const chip = document.createElement('div');
     chip.className = 'word-chip';
     chip.id = 'chip-' + w;
