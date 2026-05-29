@@ -325,7 +325,11 @@ function init() {
   // Думи — разбъркани
   const wc = document.getElementById('words-container');
   wc.innerHTML = '';
-  const shuffled = [...WORDS].sort(() => Math.random() - 0.5);
+  const shuffled = [...WORDS];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
   shuffled.forEach(w => {
     const chip = document.createElement('div');
     chip.className = 'word-chip';
