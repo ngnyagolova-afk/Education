@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>GitHub Actions — Попълни workflow</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #0d1117;
+  color: #c9d1d9;
+  min-height: 100vh;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+header {
+  background: linear-gradient(135deg, #161b22, #21262d);
+  border-bottom: 1px solid #30363d;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+header h1 { font-size: 0.95rem; color: #e6edf3; line-height: 1.4; }
+header h1 small { color: #8b949e; font-weight: 400; font-size: 0.8rem; }
+
+#score-badge {
+  background: #238636;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: bold;
+  padding: 5px 12px;
+  border-radius: 20px;
+  min-width: 54px;
+  text-align: center;
+}
+
+.container { padding: 16px; max-width: 700px; margin: 0 auto; }
+
+/* ── Думи за влачене ── */
+.words-panel {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 18px;
+}
+.words-panel h3 {
+  font-size: 0.78rem;
+  color: #8b949e;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-bottom: 10px;
+}
+#words-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.word-chip {
+  background: #1f6feb;
+  color: white;
+  padding: 7px 14px;
+  border-radius: 20px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  cursor: grab;
+  touch-action: none;
+  transition: transform .15s, opacity .15s, background .15s;
+  white-space: nowrap;
+  display: inline-block;
+}
+.word-chip:active { transform: scale(1.08); }
+.word-chip.used   { opacity: 0.28; pointer-events: none; }
+.word-chip.dragging { opacity: 0.5; transform: scale(1.1); }
+
+/* ── Код блок ── */
+.code-block {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  padding: 16px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.82rem;
+  line-height: 2.1;
+  overflow-x: auto;
+  margin-bottom: 18px;
+}
+.code-line { white-space: pre; }
+.indent1 { padding-left: 1.4em; }
+.indent2 { padding-left: 2.8em; }
+.indent3 { padding-left: 4.2em; }
+.indent4 { padding-left: 5.6em; }
+
+.comment { color: #8b949e; }
+.key     { color: #ff7b72; }
+.val     { color: #a5d6ff; }
+.sym     { color: #79c0ff; }
+
+/* Бланки */
+.blank {
+  display: inline-block;
+  min-width: 120px;
+  height: 28px;
+  border: 2px dashed #388bfd;
+  border-radius: 6px;
+  background: #0d1117;
+  vertical-align: middle;
+  text-align: center;
+  line-height: 24px;
+  font-size: 0.82rem;
+  color: #58a6ff;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+  position: relative;
+  padding: 0 6px;
+}
+.blank.drag-over {
+  border-color: #3fb950;
+  background: #1a3a20;
+}
+.blank.filled {
+  border-color: #388bfd;
+  background: #1c2c3f;
+  color: #a5d6ff;
+  cursor: pointer;
+}
+.blank.correct {
+  border-color: #3fb950;
+  background: #1a3a20;
+  color: #3fb950;
+  cursor: default;
+}
+.blank.wrong {
+  border-color: #f85149;
+  background: #3d1a1a;
+  color: #f85149;
+  cursor: default;
+}
+
+/* ── Бутони ── */
+.btn {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: opacity .2s;
+}
+.btn:disabled { opacity: .4; cursor: default; }
+.btn-check  { background: #238636; color: white; }
+.btn-reset  { background: #30363d; color: #c9d1d9; }
+
+/* ── Резултат ── */
+#result-panel {
+  display: none;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 18px;
+}
+#result-panel h2 { font-size: 1.5rem; margin-bottom: 8px; }
+#result-panel p  { color: #8b949e; font-size: 0.9rem; margin-bottom: 14px; }
+
+/* ── Обяснение ── */
+#explain-panel { display: none; }
+.explain-item {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 10px;
+}
+.explain-item .blank-word {
+  color: #a5d6ff;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  font-size: 1rem;
+}
+.explain-item .explain-text {
+  color: #c9d1d9;
+  font-size: 0.88rem;
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+/* Floating drag ghost */
+#drag-ghost {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  background: #1f6feb;
+  color: white;
+  padding: 7px 14px;
+  border-radius: 20px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  display: none;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚙️ GitHub Actions<br><small>Попълни Docker workflow · КП · 11А</small></h1>
+  <div id="score-badge">0/8</div>
+</header>
+
+<div id="drag-ghost"></div>
+
+<div class="container">
+
+  <!-- Думи -->
+  <div class="words-panel">
+    <h3>Влачи думите към правилното място</h3>
+    <div id="words-container"></div>
+  </div>
+
+  <!-- Код -->
+  <div class="code-block" id="code-block"></div>
+
+  <!-- Бутони -->
+  <button class="btn btn-check" id="btn-check" onclick="checkAnswers()">Провери ✓</button>
+  <button class="btn btn-reset" onclick="resetAll()">Нулирай ↺</button>
+
+  <!-- Резултат -->
+  <div id="result-panel">
+    <h2 id="result-emoji"></h2>
+    <h2 id="result-score" style="color:#3fb950;margin-bottom:6px;"></h2>
+    <p id="result-msg"></p>
+    <button class="btn btn-check" style="width:auto;padding:10px 24px;" onclick="showExplain()">
+      Виж обяснение 📖
+    </button>
+  </div>
+
+  <!-- Обяснение -->
+  <div id="explain-panel"></div>
+
+</div>
+
+<script>
+// ── Данни ──
+const WORDS = [
+  'Build and Deploy',
+  'main',
+  'ubuntu-latest',
+  'DOCKER_USER',
+  'DOCKER_PASS',
+  'build',
+  'push',
+  'inspect',
+];
+
+const BLANKS = [
+  { id: 'b0', answer: 'Build and Deploy',
+    explain: 'Името на workflow-а — показва се в таба Actions на GitHub. Може да е всяко описателно заглавие.' },
+  { id: 'b1', answer: 'main',
+    explain: 'Клонът, при push към който се стартира pipeline-ът. "main" е основният клон на GitHub проектите.' },
+  { id: 'b2', answer: 'ubuntu-latest',
+    explain: 'Виртуалната машина (runner), на която се изпълняват стъпките. GitHub предоставя безплатни Ubuntu runners.' },
+  { id: 'b3', answer: 'DOCKER_USER',
+    explain: 'Таен ключ (Secret) с Docker Hub потребителско име. Пазен е криптиран в Settings → Secrets на репото.' },
+  { id: 'b4', answer: 'DOCKER_PASS',
+    explain: 'Таен ключ с Docker Hub парола/токен. Никога не се слага директно в кода — само чрез Secrets!' },
+  { id: 'b5', answer: 'build',
+    explain: '"docker build -t myuser/myapp:latest ." — изгражда Docker image от Dockerfile в текущата директория.' },
+  { id: 'b6', answer: 'push',
+    explain: '"docker push myuser/myapp:latest" — качва готовия image в Docker Hub регистъра.' },
+  { id: 'b7', answer: 'inspect',
+    explain: '"docker inspect" — проверява метаданните на image-а и потвърждава, че е създаден успешно.' },
+];
+
+// ── Структура на кода (редове) ──
+// Всеки ред: { text, class } — text може да съдържа маркер %%bN%% за бланка
+const CODE_LINES = [
+  { t: '<span class="comment"># .github/workflows/docker-deploy.yml</span>' },
+  { t: '<span class="key">name:</span> <span class="val">%%b0%%</span>' },
+  { t: '<span class="key">on:</span>' },
+  { t: '<span class="key">  push:</span>' },
+  { t: '<span class="key">    branches:</span> <span class="sym">[</span><span class="val">%%b1%%</span><span class="sym">]</span>' },
+  { t: '<span class="key">  pull_request:</span>' },
+  { t: '<span class="key">    branches:</span> <span class="sym">[main]</span>' },
+  { t: '<span class="key">jobs:</span>' },
+  { t: '<span class="key">  build-and-push:</span>' },
+  { t: '<span class="key">    runs-on:</span> <span class="val">%%b2%%</span>' },
+  { t: '<span class="key">    steps:</span>' },
+  { t: '<span class="sym">      - name:</span> Изтегли кода' },
+  { t: '<span class="key">        uses:</span> <span class="val">actions/checkout@v4</span>' },
+  { t: '<span class="sym">      - name:</span> Логин в Docker Hub' },
+  { t: '<span class="key">        uses:</span> <span class="val">docker/login-action@v3</span>' },
+  { t: '<span class="key">        with:</span>' },
+  { t: '<span class="key">          username:</span> <span class="sym">${{</span> secrets.<span class="val">%%b3%%</span> <span class="sym">}}</span>' },
+  { t: '<span class="key">          password:</span> <span class="sym">${{</span> secrets.<span class="val">%%b4%%</span> <span class="sym">}}</span>' },
+  { t: '<span class="sym">      - name:</span> Изгради и публикувай Image' },
+  { t: '<span class="key">        run:</span> <span class="sym">|</span>' },
+  { t: '          docker <span class="val">%%b5%%</span> -t myuser/myapp:latest .' },
+  { t: '          docker <span class="val">%%b6%%</span> myuser/myapp:latest' },
+  { t: '<span class="sym">      - name:</span> Провери image' },
+  { t: '        run: docker <span class="val">%%b7%%</span> myuser/myapp:latest' },
+];
+
+// ── Инициализация ──
+let placed = {};        // blankId → word
+let dragWord = null;    // думата, която се влачи
+
+function init() {
+  // Думи
+  const wc = document.getElementById('words-container');
+  wc.innerHTML = '';
+  WORDS.forEach(w => {
+    const chip = document.createElement('div');
+    chip.className = 'word-chip';
+    chip.id = 'chip-' + w;
+    chip.textContent = w;
+    chip.dataset.word = w;
+    setupDrag(chip);
+    wc.appendChild(chip);
+  });
+
+  // Код
+  const cb = document.getElementById('code-block');
+  cb.innerHTML = '';
+  CODE_LINES.forEach(line => {
+    const div = document.createElement('div');
+    div.className = 'code-line';
+    div.innerHTML = line.t.replace(/%%b(\d+)%%/g, (_, n) => {
+      const id = 'b' + n;
+      return `<span class="blank" id="${id}" data-blank="${id}">___</span>`;
+    });
+    cb.appendChild(div);
+  });
+
+  // Слушатели за бланки
+  document.querySelectorAll('.blank').forEach(blank => {
+    setupBlankDrop(blank);
+  });
+
+  placed = {};
+  document.getElementById('result-panel').style.display = 'none';
+  document.getElementById('explain-panel').style.display = 'none';
+  document.getElementById('explain-panel').innerHTML = '';
+  updateScore();
+}
+
+// ── Drag & Drop — мишка + пръст ──
+function setupDrag(chip) {
+  // Touch
+  chip.addEventListener('touchstart', onTouchStart, { passive: false });
+  // Mouse
+  chip.addEventListener('mousedown', onMouseDown);
+}
+
+let _ghost = null;
+let _activeChip = null;
+let _overBlank  = null;
+
+function getGhost() {
+  return document.getElementById('drag-ghost');
+}
+
+function startDrag(chip, x, y) {
+  _activeChip = chip;
+  dragWord = chip.dataset.word;
+  chip.classList.add('dragging');
+  const g = getGhost();
+  g.textContent = dragWord;
+  g.style.display = 'block';
+  moveGhost(x, y);
+}
+
+function moveGhost(x, y) {
+  const g = getGhost();
+  g.style.left = x + 'px';
+  g.style.top  = y + 'px';
+}
+
+function endDrag(x, y) {
+  const g = getGhost();
+  g.style.display = 'none';
+  if (_activeChip) _activeChip.classList.remove('dragging');
+
+  // Намери бланка под пръста/мишката
+  const el = getElementAtPoint(x, y);
+  if (el && el.classList.contains('blank') && !el.classList.contains('correct')) {
+    dropOnBlank(el);
+  }
+
+  _activeChip = null;
+  _overBlank  = null;
+  dragWord    = null;
+  document.querySelectorAll('.blank').forEach(b => b.classList.remove('drag-over'));
+}
+
+function getElementAtPoint(x, y) {
+  const g = getGhost();
+  g.style.display = 'none';
+  const el = document.elementFromPoint(x, y);
+  g.style.display = 'block';
+  return el;
+}
+
+// Touch
+function onTouchStart(e) {
+  e.preventDefault();
+  const t = e.touches[0];
+  startDrag(e.currentTarget, t.clientX, t.clientY);
+
+  document.addEventListener('touchmove', onTouchMove, { passive: false });
+  document.addEventListener('touchend',  onTouchEnd,  { once: true });
+}
+function onTouchMove(e) {
+  e.preventDefault();
+  const t = e.touches[0];
+  moveGhost(t.clientX, t.clientY);
+  // Highlight blank under finger
+  const el = getElementAtPoint(t.clientX, t.clientY);
+  document.querySelectorAll('.blank').forEach(b => b.classList.remove('drag-over'));
+  if (el && el.classList.contains('blank')) el.classList.add('drag-over');
+}
+function onTouchEnd(e) {
+  document.removeEventListener('touchmove', onTouchMove);
+  const t = e.changedTouches[0];
+  endDrag(t.clientX, t.clientY);
+}
+
+// Mouse
+function onMouseDown(e) {
+  startDrag(e.currentTarget, e.clientX, e.clientY);
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup',   onMouseUp, { once: true });
+}
+function onMouseMove(e) {
+  moveGhost(e.clientX, e.clientY);
+  const el = getElementAtPoint(e.clientX, e.clientY);
+  document.querySelectorAll('.blank').forEach(b => b.classList.remove('drag-over'));
+  if (el && el.classList.contains('blank')) el.classList.add('drag-over');
+}
+function onMouseUp(e) {
+  document.removeEventListener('mousemove', onMouseMove);
+  endDrag(e.clientX, e.clientY);
+}
+
+function dropOnBlank(blank) {
+  const blankId = blank.dataset.blank;
+
+  // Освободи предишната дума в тази бланка
+  if (placed[blankId]) {
+    const old = placed[blankId];
+    document.getElementById('chip-' + old).classList.remove('used');
+  }
+
+  // Постави новата
+  placed[blankId] = dragWord;
+  blank.textContent = dragWord;
+  blank.classList.add('filled');
+  blank.classList.remove('wrong');
+  document.getElementById('chip-' + dragWord).classList.add('used');
+  updateScore();
+}
+
+// Клик на бланка — премахва думата
+document.addEventListener('click', e => {
+  const blank = e.target.closest('.blank');
+  if (!blank || blank.classList.contains('correct') || !blank.classList.contains('filled')) return;
+  const blankId = blank.dataset.blank;
+  const word = placed[blankId];
+  if (word) document.getElementById('chip-' + word).classList.remove('used');
+  delete placed[blankId];
+  blank.textContent = '___';
+  blank.classList.remove('filled', 'wrong');
+  updateScore();
+});
+
+function updateScore() {
+  const filled = Object.keys(placed).length;
+  document.getElementById('score-badge').textContent = filled + '/8';
+  document.getElementById('btn-check').disabled = filled < 8;
+}
+
+// ── Проверка ──
+function checkAnswers() {
+  let correct = 0;
+  BLANKS.forEach(b => {
+    const blank = document.getElementById(b.id);
+    if (!blank) return;
+    if (placed[b.id] === b.answer) {
+      blank.classList.add('correct');
+      blank.classList.remove('wrong', 'filled');
+      correct++;
+    } else {
+      blank.classList.add('wrong');
+      blank.classList.remove('correct', 'filled');
+    }
+  });
+
+  const rp = document.getElementById('result-panel');
+  rp.style.display = 'block';
+  document.getElementById('result-score').textContent = correct + ' / 8 верни';
+
+  const emojis = ['😕','😕','😕','🙂','🙂','👍','👍','🎯','🏆'];
+  document.getElementById('result-emoji').textContent = emojis[correct];
+
+  const msgs = {
+    8: 'Перфектно! Знаеш GitHub Actions! 🏆',
+    7: 'Много добре! Почти перфектно.',
+    6: 'Добре! Само още малко практика.',
+    5: 'Средно — прегледай обяснението.',
+  };
+  document.getElementById('result-msg').textContent =
+    msgs[correct] || 'Прегледай теорията за GitHub Actions.';
+
+  rp.scrollIntoView({ behavior: 'smooth' });
+}
+
+// ── Обяснение ──
+function showExplain() {
+  const ep = document.getElementById('explain-panel');
+  ep.style.display = 'block';
+  ep.innerHTML = '<h3 style="color:#8b949e;font-size:.85rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">Обяснение на всяка бланка</h3>';
+  BLANKS.forEach(b => {
+    const div = document.createElement('div');
+    div.className = 'explain-item';
+    div.innerHTML =
+      `<div class="blank-word">» ${b.answer}</div>` +
+      `<div class="explain-text">${b.explain}</div>`;
+    ep.appendChild(div);
+  });
+  ep.scrollIntoView({ behavior: 'smooth' });
+}
+
+// ── Нулиране ──
+function resetAll() {
+  init();
+}
+
+init();
+</script>
+</body>
+</html>
