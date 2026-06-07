@@ -527,6 +527,28 @@ const questions = [
 let current = 0;
 let userAnswers = new Array(questions.length).fill(-1);
 let studentName = '';
+let shuffledQuestions = [];
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function prepareQuestions() {
+  shuffledQuestions = shuffle(questions).map(q => {
+    const correctText = q.options[q.answer];
+    const shuffledOpts = shuffle(q.options);
+    return {
+      q: q.q,
+      options: shuffledOpts,
+      answer: shuffledOpts.indexOf(correctText)
+    };
+  });
+}
 
 function startQuiz() {
   const input = document.getElementById('name-input');
@@ -542,6 +564,8 @@ function startQuiz() {
 
   studentName = name;
   quizActive = true;
+  prepareQuestions();
+  userAnswers = new Array(shuffledQuestions.length).fill(-1);
   document.getElementById('start-screen').style.display = 'none';
   document.getElementById('quiz-main').style.display = '';
   document.getElementById('header-sub').textContent = name;
@@ -561,7 +585,7 @@ document.getElementById('name-input').addEventListener('keydown', function(e) {
 function buildQuiz() {
   const main = document.getElementById('quiz-main');
   main.innerHTML = '';
-  questions.forEach((q, idx) => {
+  shuffledQuestions.forEach((q, idx) => {
     const card = document.createElement('div');
     card.className = 'question-card' + (idx === 0 ? ' active' : '');
     card.id = 'q-' + idx;
@@ -574,12 +598,12 @@ function buildQuiz() {
     `).join('');
 
     card.innerHTML = `
-      <div class="q-number">Въпрос ${idx+1} от ${questions.length}</div>
+      <div class="q-number">Въпрос ${idx+1} от ${shuffledQuestions.length}</div>
       <div class="q-text">${q.q.replace(/\n/g, '<br>')}</div>
       <div class="options">${opts}</div>
       <div class="nav-buttons">
         <button class="btn btn-primary" id="btn-${idx}" onclick="nextQuestion(${idx})" disabled>
-          ${idx < questions.length - 1 ? 'Следващ →' : 'Завърши теста'}
+          ${idx < shuffledQuestions.length - 1 ? 'Следващ →' : 'Завърши теста'}
         </button>
       </div>
     `;
@@ -600,7 +624,7 @@ function selectOption(qIdx, optIdx) {
 function nextQuestion(qIdx) {
   if (userAnswers[qIdx] === -1) return;
 
-  if (qIdx < questions.length - 1) {
+  if (qIdx < shuffledQuestions.length - 1) {
     document.getElementById('q-' + qIdx).classList.remove('active');
     current = qIdx + 1;
     document.getElementById('q-' + current).classList.add('active');
@@ -613,10 +637,10 @@ function nextQuestion(qIdx) {
 }
 
 function updateProgress() {
-  const pct = Math.round((current / questions.length) * 100);
+  const pct = Math.round((current / shuffledQuestions.length) * 100);
   document.getElementById('progress-bar').style.width = pct + '%';
   document.getElementById('progress-text').textContent =
-    'Въпрос ' + (current + 1) + ' от ' + questions.length;
+    'Въпрос ' + (current + 1) + ' от ' + shuffledQuestions.length;
 }
 
 let lastScore = 0;
@@ -640,10 +664,10 @@ function showResults(autoSubmit) {
   result.classList.add('show');
 
   let score = 0;
-  questions.forEach((q, i) => { if (userAnswers[i] === q.answer) score++; });
+  shuffledQuestions.forEach((q, i) => { if (userAnswers[i] === q.answer) score++; });
   lastScore = score;
 
-  const pct = Math.round((score / questions.length) * 100);
+  const pct = Math.round((score / shuffledQuestions.length) * 100);
   lastPct = pct;
   const grade = calcGrade(pct);
   lastGradeNum = grade;
@@ -680,7 +704,7 @@ function showResults(autoSubmit) {
 }
 
 function sendResults() {
-  const detailLines = questions.map((q, i) => {
+  const detailLines = shuffledQuestions.map((q, i) => {
     const isOk = userAnswers[i] === q.answer;
     const given = userAnswers[i] >= 0 ? q.options[userAnswers[i]] : '(без отговор)';
     const right = q.options[q.answer];
@@ -745,7 +769,8 @@ function restartQuiz() {
   studentName = '';
 
   current = 0;
-  userAnswers = new Array(questions.length).fill(-1);
+  shuffledQuestions = [];
+  userAnswers = [];
   studentName = '';
   quizActive = false;
   document.getElementById('result-screen').classList.remove('show');
