@@ -28,6 +28,34 @@
   header h1 { font-size: 1.3rem; font-weight: 700; }
   header p  { font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
 
+  #timer {
+    display: inline-block;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-top: 6px;
+    padding: 4px 14px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.2);
+    letter-spacing: 0.05em;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  #timer.warning {
+    background: #f9a825;
+    color: #1a1a2e;
+  }
+
+  #timer.danger {
+    background: #e17055;
+    color: white;
+    animation: pulse 1s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.65; }
+  }
+
   #progress-bar-wrap {
     background: rgba(255,255,255,0.3);
     border-radius: 99px;
@@ -312,6 +340,7 @@
 <header>
   <h1>Тест – 2 Модул &nbsp;·&nbsp; ООП с C#</h1>
   <p id="header-sub">20 въпроса с избор</p>
+  <div id="timer" style="display:none;">⏱ 20:00</div>
   <div id="progress-bar-wrap"><div id="progress-bar"></div></div>
   <div id="progress-text"></div>
 </header>
@@ -528,6 +557,8 @@ let current = 0;
 let userAnswers = new Array(questions.length).fill(-1);
 let studentName = '';
 let shuffledQuestions = [];
+let timerInterval = null;
+let secondsLeft = 20 * 60;
 
 function shuffle(arr) {
   const a = [...arr];
@@ -564,6 +595,7 @@ function startQuiz() {
 
   studentName = name;
   quizActive = true;
+  secondsLeft = 20 * 60;
   prepareQuestions();
   userAnswers = new Array(shuffledQuestions.length).fill(-1);
   document.getElementById('start-screen').style.display = 'none';
@@ -571,6 +603,38 @@ function startQuiz() {
   document.getElementById('header-sub').textContent = name;
   buildQuiz();
   updateProgress();
+  startTimer();
+}
+
+function startTimer() {
+  const el = document.getElementById('timer');
+  el.style.display = 'inline-block';
+  updateTimerDisplay();
+
+  timerInterval = setInterval(() => {
+    secondsLeft--;
+    updateTimerDisplay();
+
+    if (secondsLeft <= 0) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      if (quizActive) {
+        quizActive = false;
+        showResults('time');
+      }
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('timer');
+  const m = Math.floor(secondsLeft / 60);
+  const s = secondsLeft % 60;
+  el.textContent = '⏱ ' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+
+  el.classList.remove('warning', 'danger');
+  if (secondsLeft <= 60)       el.classList.add('danger');
+  else if (secondsLeft <= 300) el.classList.add('warning');
 }
 
 document.getElementById('name-input').addEventListener('input', function() {
@@ -658,6 +722,8 @@ function calcGrade(pct) {
 }
 
 function showResults(autoSubmit) {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  document.getElementById('timer').style.display = 'none';
   wasAutoSubmit = autoSubmit;
   document.getElementById('quiz-main').style.display = 'none';
   const result = document.getElementById('result-screen');
@@ -691,9 +757,13 @@ function showResults(autoSubmit) {
   document.getElementById('result-name').textContent = studentName;
   document.getElementById('result-title').textContent = emoji + ' ' + gradeText;
 
-  const subText = autoSubmit
-    ? '⚠️ Тестът беше предаден автоматично (напуснахте екрана).\nВерни отговори: ' + score + ' от ' + questions.length
-    : 'Верни отговори: ' + score + ' от ' + questions.length;
+  let subText;
+  if (autoSubmit === 'time')
+    subText = '⏱ Времето изтече — тестът беше предаден автоматично.\nВерни отговори: ' + score + ' от ' + shuffledQuestions.length;
+  else if (autoSubmit)
+    subText = '⚠️ Тестът беше предаден автоматично (напуснахте екрана).\nВерни отговори: ' + score + ' от ' + shuffledQuestions.length;
+  else
+    subText = 'Верни отговори: ' + score + ' от ' + shuffledQuestions.length;
   document.getElementById('result-sub').textContent = subText;
 
   document.getElementById('progress-bar').style.width = '100%';
@@ -714,7 +784,9 @@ function sendResults() {
   }).join('\n\n');
 
   const now = new Date().toLocaleString('bg-BG', { timeZone: 'Europe/Sofia' });
-  const forced = wasAutoSubmit ? '\n⚠️ ПРИНУДИТЕЛНО ПРЕДАВАНЕ: напусна екрана\n' : '';
+  const forced = wasAutoSubmit === 'time'
+    ? '\n⏱ ПРИНУДИТЕЛНО ПРЕДАВАНЕ: изтече времето\n'
+    : wasAutoSubmit ? '\n⚠️ ПРИНУДИТЕЛНО ПРЕДАВАНЕ: напусна екрана\n' : '';
 
   const body =
     'Ученик: ' + studentName + '\n' +
@@ -768,7 +840,9 @@ function restartQuiz() {
   userAnswers = new Array(questions.length).fill(-1);
   studentName = '';
 
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
   current = 0;
+  secondsLeft = 20 * 60;
   shuffledQuestions = [];
   userAnswers = [];
   studentName = '';
