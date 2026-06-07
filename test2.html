@@ -321,6 +321,41 @@
     margin-top: 6px;
   }
 
+  #review-list {
+    margin: 16px 0 8px;
+  }
+
+  #review-list h3 {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #888;
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+
+  .dots-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .dot-item {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: white;
+  }
+
+  .dot-item.correct { background: #27ae60; }
+  .dot-item.wrong   { background: #e74c3c; }
+  .dot-item.skipped { background: #bbb; }
+
   .btn-retry {
     background: #eef2f7;
     color: #1F497D;
@@ -375,6 +410,7 @@
   <h2 id="result-title"></h2>
   <div id="grade-badge" class="grade-badge"></div>
   <p id="result-sub"></p>
+  <div id="review-list"></div>
   <div id="send-status" style="font-size:0.88rem; color:#888; margin-top:10px; min-height:20px;"></div>
   <button class="btn-retry" onclick="restartQuiz()">🔄 Опитай отново</button>
 </div>
@@ -768,9 +804,28 @@ function showResults(autoSubmit) {
 
   document.getElementById('progress-bar').style.width = '100%';
   document.getElementById('progress-text').textContent = 'Предаден';
+
+  buildReviewDots();
+
   result.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   sendResults();
+}
+
+function buildReviewDots() {
+  const list = document.getElementById('review-list');
+  list.innerHTML = '<h3>Преглед на отговорите</h3><div class="dots-grid"></div>';
+  const grid = list.querySelector('.dots-grid');
+
+  shuffledQuestions.forEach((q, i) => {
+    const dot = document.createElement('div');
+    if (userAnswers[i] < 0)
+      dot.className = 'dot-item skipped';
+    else
+      dot.className = 'dot-item ' + (userAnswers[i] === q.answer ? 'correct' : 'wrong');
+    dot.textContent = i + 1;
+    grid.appendChild(dot);
+  });
 }
 
 function sendResults() {
