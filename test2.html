@@ -828,9 +828,6 @@ function buildReviewDots() {
   });
 }
 
-// ── Замени с URL-а на твоя Apps Script след deployment ──
-const SHEET_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyXHXv3x_VKeqRW1Km1ZGWJ5kf5VFNybjNFLxxJc3oStfBuRUnsp_o4AJ9AbYaE6qUdTw/exec';
-
 function sendResults() {
   const detailLines = shuffledQuestions.map((q, i) => {
     const isOk = userAnswers[i] === q.answer;
@@ -848,29 +845,7 @@ function sendResults() {
   const status = document.getElementById('send-status');
   status.textContent = '⏳ Изпращане на резултати...';
 
-  const payload = {
-    name: studentName,
-    score: lastScore,
-    total: 20,
-    grade: lastGradeNum,
-    pct: lastPct,
-    forced: forceLabel,
-    date: now,
-    details: detailLines
-  };
-
-  // 1. Запис в Google Sheets (основно)
-  const sheetPromise = SHEET_SCRIPT_URL !== 'PASTE_YOUR_APPS_SCRIPT_URL_HERE'
-    ? fetch(SHEET_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify(payload)
-      }).then(() => true).catch(() => false)
-    : Promise.resolve(false);
-
-  // 2. Имейл чрез FormSubmit (резервно)
-  const emailPromise = fetch('https://formsubmit.co/ajax/ngnyagolova@gmail.com', {
+  fetch('https://formsubmit.co/ajax/ngnyagolova@gmail.com', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify({
@@ -883,14 +858,17 @@ function sendResults() {
       Принудително: forceLabel,
       Отговори: detailLines
     })
-  }).then(r => r.json()).then(r => r.success === 'true').catch(() => false);
-
-  Promise.all([sheetPromise, emailPromise]).then(([sheetOk, emailOk]) => {
-    if (sheetOk || emailOk) {
-      status.textContent = '✅ Резултатите са записани.';
+  })
+  .then(r => r.json())
+  .then(r => {
+    if (r.success === 'true') {
+      status.textContent = '✅ Резултатите са изпратени на учителя.';
     } else {
-      status.textContent = '⚠️ Неуспешно изпращане. Кажете на учителя!';
+      status.textContent = '⚠️ Грешка: ' + (r.message || 'неизвестна');
     }
+  })
+  .catch(err => {
+    status.textContent = '❌ Мрежова грешка — кажете на учителя! (' + err.message + ')';
   });
 }
 
