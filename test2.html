@@ -331,17 +331,14 @@
 
 <!-- Скрита форма за изпращане без fetch -->
 <iframe name="fs-frame" style="display:none"></iframe>
-<form id="fs-form" action="https://formsubmit.co/ngnyagolova@gmail.com"
+<form id="fs-form" action="https://script.google.com/macros/s/AKfycbyU1R9RbyuzAj4t6lt-IMkFs5Jg6ndx5aXffaFS9GmqpRpkoihoOSjE5Rn_QvzizvlwyA/exec"
       method="POST" target="fs-frame" style="display:none">
-  <input type="hidden" name="_subject"    id="fs-subject">
-  <input type="hidden" name="_template"   value="box">
-  <input type="hidden" name="_captcha"    value="false">
-  <input type="hidden" name="_next"       value="about:blank">
-  <input type="hidden" name="Ученик"      id="fs-name">
-  <input type="hidden" name="Резултат"    id="fs-result">
-  <input type="hidden" name="Дата"        id="fs-date">
-  <input type="hidden" name="Принудително" id="fs-forced">
-  <input type="hidden" name="Отговори"    id="fs-details">
+  <input type="hidden" name="name"    id="fs-name">
+  <input type="hidden" name="result"  id="fs-result">
+  <input type="hidden" name="grade"   id="fs-grade">
+  <input type="hidden" name="date"    id="fs-date">
+  <input type="hidden" name="forced"  id="fs-forced">
+  <input type="hidden" name="details" id="fs-details">
 </form>
 
 <!-- Въпроси -->
@@ -744,9 +741,9 @@ function sendResults(correct, pct, grade, forceMsg) {
 
   const now = new Date().toLocaleString('bg-BG', { timeZone: 'Europe/Sofia' });
 
-  document.getElementById('fs-subject').value = '📝 Тест 2 Модул — ' + studentName + ' — Оценка ' + grade;
   document.getElementById('fs-name').value    = studentName;
-  document.getElementById('fs-result').value  = correct + '/20 — Оценка ' + grade;
+  document.getElementById('fs-result').value  = correct + '/20';
+  document.getElementById('fs-grade').value   = 'Оценка ' + grade;
   document.getElementById('fs-date').value    = now;
   document.getElementById('fs-forced').value  = forceMsg || 'не';
   document.getElementById('fs-details').value = detailLines;
