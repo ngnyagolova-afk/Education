@@ -855,35 +855,28 @@ function sendResults() {
   const status = document.getElementById('send-status');
   status.textContent = '⏳ Изпращане на резултати...';
 
-  const payload = JSON.stringify({
-    _subject: '📝 Тест 2 Модул — ' + studentName + ' — Оценка ' + lastGradeNum,
-    _template: 'box',
-    _captcha: 'false',
-    Ученик: studentName,
-    Резултат: lastScore + '/20 — Оценка ' + lastGradeNum,
-    Дата: now,
-    Принудително: wasAutoSubmit ? 'ДА' : 'не',
-    Отговори: detailLines
+  const url = 'https://script.google.com/macros/s/AKfycbwGDVXZoUWOmqNmowMPD4hSDEV4gDnwQ9rbcDkOQn2y-7DCWHl-lxozz9yGMH9BSuGc/exec';
+
+  const params = new URLSearchParams({
+    name:    studentName,
+    score:   lastScore + '/20 (' + lastPct + '%)',
+    grade:   lastGradeNum,
+    date:    now,
+    forced:  wasAutoSubmit ? 'ДА' : 'не',
+    answers: detailLines
   });
 
-  const url = 'https://formsubmit.co/ajax/ngnyagolova@gmail.com';
-
-  // sendBeacon работи дори когато страницата е на заден план (auto-submit)
+  // sendBeacon — надежден дори при напускане на екрана
   const beaconSent = navigator.sendBeacon
-    ? navigator.sendBeacon(url, new Blob([payload], { type: 'application/json' }))
+    ? navigator.sendBeacon(url, params)
     : false;
 
   if (beaconSent) {
     status.textContent = '✅ Резултатите са изпратени.';
   } else {
-    fetch(url, {
-      method: 'POST',
-      keepalive: true,
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: payload
-    })
-    .then(() => { status.textContent = '✅ Резултатите са изпратени.'; })
-    .catch(() => { status.textContent = '❌ Грешка при изпращане.'; });
+    fetch(url, { method: 'POST', mode: 'no-cors', body: params })
+      .then(() => { status.textContent = '✅ Резултатите са изпратени.'; })
+      .catch(() => { status.textContent = '❌ Грешка при изпращане.'; });
   }
 }
 
