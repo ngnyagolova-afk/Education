@@ -329,6 +329,21 @@
   </div>
 </div>
 
+<!-- Скрита форма за изпращане без fetch -->
+<iframe name="fs-frame" style="display:none"></iframe>
+<form id="fs-form" action="https://formsubmit.co/ngnyagolova@gmail.com"
+      method="POST" target="fs-frame" style="display:none">
+  <input type="hidden" name="_subject"    id="fs-subject">
+  <input type="hidden" name="_template"   value="box">
+  <input type="hidden" name="_captcha"    value="false">
+  <input type="hidden" name="_next"       value="about:blank">
+  <input type="hidden" name="Ученик"      id="fs-name">
+  <input type="hidden" name="Резултат"    id="fs-result">
+  <input type="hidden" name="Дата"        id="fs-date">
+  <input type="hidden" name="Принудително" id="fs-forced">
+  <input type="hidden" name="Отговори"    id="fs-details">
+</form>
+
 <!-- Въпроси -->
 <div id="screen-quiz" class="screen">
   <div id="quiz-main"></div>
@@ -728,31 +743,16 @@ function sendResults(correct, pct, grade, forceMsg) {
   }).join('\n\n');
 
   const now = new Date().toLocaleString('bg-BG', { timeZone: 'Europe/Sofia' });
-  const status = document.getElementById('send-status');
 
-  fetch('https://formsubmit.co/ajax/ngnyagolova@gmail.com', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({
-      _subject: '📝 Тест 2 Модул — ' + studentName + ' — Оценка ' + grade,
-      _template: 'box',
-      _captcha: 'false',
-      Ученик: studentName,
-      Резултат: correct + '/20 — Оценка ' + grade,
-      Дата: now,
-      Принудително: forceMsg || 'не',
-      Отговори: detailLines
-    })
-  })
-  .then(r => r.json())
-  .then(r => {
-    status.textContent = r.success === 'true'
-      ? '✅ Резултатите са изпратени на учителя.'
-      : '⚠️ ' + (r.message || 'Грешка при изпращане');
-  })
-  .catch(err => {
-    status.textContent = '❌ Мрежова грешка (' + err.message + ')';
-  });
+  document.getElementById('fs-subject').value = '📝 Тест 2 Модул — ' + studentName + ' — Оценка ' + grade;
+  document.getElementById('fs-name').value    = studentName;
+  document.getElementById('fs-result').value  = correct + '/20 — Оценка ' + grade;
+  document.getElementById('fs-date').value    = now;
+  document.getElementById('fs-forced').value  = forceMsg || 'не';
+  document.getElementById('fs-details').value = detailLines;
+  document.getElementById('fs-form').submit();
+
+  document.getElementById('send-status').textContent = '✅ Резултатите са изпратени на учителя.';
 }
 
 /* Блокиране на назад бутон */
