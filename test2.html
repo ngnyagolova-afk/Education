@@ -855,29 +855,27 @@ function sendResults() {
   const status = document.getElementById('send-status');
   status.textContent = '⏳ Изпращане на резултати...';
 
-  const url = 'https://script.google.com/macros/s/AKfycbwGDVXZoUWOmqNmowMPD4hSDEV4gDnwQ9rbcDkOQn2y-7DCWHl-lxozz9yGMH9BSuGc/exec';
-
-  const params = new URLSearchParams({
-    name:    studentName,
-    score:   lastScore + '/20 (' + lastPct + '%)',
-    grade:   lastGradeNum,
-    date:    now,
-    forced:  wasAutoSubmit ? 'ДА' : 'не',
-    answers: detailLines
-  });
-
-  // sendBeacon — надежден дори при напускане на екрана
-  const beaconSent = navigator.sendBeacon
-    ? navigator.sendBeacon(url, params)
-    : false;
-
-  if (beaconSent) {
-    status.textContent = '✅ Резултатите са изпратени.';
-  } else {
-    fetch(url, { method: 'POST', mode: 'no-cors', body: params })
-      .then(() => { status.textContent = '✅ Резултатите са изпратени.'; })
-      .catch(() => { status.textContent = '❌ Грешка при изпращане.'; });
-  }
+  fetch('https://formsubmit.co/ajax/ngnyagolova@gmail.com', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({
+      _subject: '📝 Тест 2 Модул — ' + studentName + ' — Оценка ' + lastGradeNum,
+      _template: 'box',
+      _captcha: 'false',
+      Ученик: studentName,
+      Резултат: lastScore + '/20 — Оценка ' + lastGradeNum,
+      Дата: now,
+      Принудително: wasAutoSubmit ? 'ДА' : 'не',
+      Отговори: detailLines
+    })
+  })
+  .then(r => r.json())
+  .then(r => {
+    status.textContent = r.success === 'true'
+      ? '✅ Резултатите са изпратени.'
+      : '❌ ' + (r.message || 'Грешка');
+  })
+  .catch(err => { status.textContent = '❌ ' + err.message; });
 }
 
 // Auto-submit when student leaves the screen
