@@ -857,6 +857,7 @@ function sendResults() {
 
   fetch('https://formsubmit.co/ajax/ngnyagolova@gmail.com', {
     method: 'POST',
+    keepalive: true,
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify({
       _subject: '📝 Тест 2 Модул — ' + studentName + ' — Оценка ' + lastGradeNum,
