@@ -845,13 +845,12 @@ function sendResults() {
   const status = document.getElementById('send-status');
   status.textContent = '⏳ Изпращане на резултати...';
 
-  fetch('https://formsubmit.co/ajax/ngnyagolova@gmail.com', {
+  fetch('https://api.web3forms.com/submit', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify({
-      _subject: '📝 Тест 2 Модул — ' + studentName + ' — Оценка ' + lastGradeNum,
-      _template: 'box',
-      _captcha: 'false',
+      access_key: '286cba95-aed8-4b40-8cd4-ca7805fc1e0e',
+      subject: '📝 Тест 2 Модул — ' + studentName + ' — Оценка ' + lastGradeNum,
       Ученик: studentName,
       Резултат: lastScore + '/20 — Оценка ' + lastGradeNum,
       Дата: now,
@@ -861,7 +860,7 @@ function sendResults() {
   })
   .then(r => r.json())
   .then(r => {
-    if (r.success === 'true') {
+    if (r.success) {
       status.textContent = '✅ Резултатите са изпратени на учителя.';
     } else {
       status.textContent = '⚠️ Грешка: ' + (r.message || 'неизвестна');
