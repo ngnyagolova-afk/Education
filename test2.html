@@ -2,8 +2,8 @@
 <html lang="bg">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Тест – 2 Модул</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Тест — 2 Модул</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -12,589 +12,527 @@
     background: #f0f4f8;
     color: #1a1a2e;
     min-height: 100vh;
+    -webkit-user-select: none;
+    user-select: none;
   }
 
   header {
-    background: linear-gradient(135deg, #1F497D, #2e86de);
+    background: linear-gradient(135deg, #1F497D, #2E74B5);
     color: white;
-    padding: 20px 16px 16px;
-    text-align: center;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
   }
-
-  header h1 { font-size: 1.3rem; font-weight: 700; }
-  header p  { font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
-
+  header h1 { font-size: 1rem; line-height: 1.3; }
   #timer {
-    display: inline-block;
-    font-size: 1rem;
-    font-weight: 700;
-    margin-top: 6px;
-    padding: 4px 14px;
-    border-radius: 20px;
-    background: rgba(255,255,255,0.2);
-    letter-spacing: 0.05em;
-    transition: background 0.3s, color 0.3s;
-  }
-
-  #timer.warning {
-    background: #f9a825;
-    color: #1a1a2e;
-  }
-
-  #timer.danger {
-    background: #e17055;
+    background: #ED7D31;
     color: white;
-    animation: pulse 1s infinite;
+    font-size: 1.15rem;
+    font-weight: bold;
+    padding: 6px 14px;
+    border-radius: 20px;
+    min-width: 72px;
+    text-align: center;
+    transition: background 0.3s;
+    display: none;
   }
+  #timer.warning { background: #c0392b; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
 
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50%       { opacity: 0.65; }
-  }
-
-  #progress-bar-wrap {
-    background: rgba(255,255,255,0.3);
-    border-radius: 99px;
-    height: 6px;
-    margin-top: 10px;
-    overflow: hidden;
-  }
+  #progress-wrap { background: #dde3ea; height: 6px; }
   #progress-bar {
-    height: 100%;
-    background: #ffd32a;
-    border-radius: 99px;
-    transition: width 0.4s;
+    height: 6px;
+    background: linear-gradient(90deg, #27ae60, #2E74B5);
     width: 0%;
+    transition: width 0.4s;
   }
   #progress-text {
+    text-align: center;
     font-size: 0.78rem;
-    margin-top: 5px;
-    opacity: 0.9;
+    color: #888;
+    padding: 4px 0 2px;
   }
 
-  main {
-    max-width: 640px;
-    margin: 0 auto;
-    padding: 16px 12px 80px;
-  }
+  .screen { display: none; padding: 24px 18px; max-width: 640px; margin: 0 auto; }
+  .screen.active { display: block; }
 
-  /* ── Start screen ── */
-  #start-screen {
-    max-width: 480px;
-    margin: 40px auto 0;
+  /* Начален екран */
+  #screen-start .card {
     background: white;
     border-radius: 16px;
-    padding: 32px 24px;
+    padding: 30px 24px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.10);
     text-align: center;
   }
+  #screen-start h2 { color: #1F497D; font-size: 1.35rem; margin-bottom: 8px; }
+  #screen-start p { color: #555; font-size: 0.93rem; margin-bottom: 20px; line-height: 1.5; }
 
-  #start-screen h2 {
-    font-size: 1.4rem;
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .info-item {
+    background: #f0f4f8;
+    border-radius: 10px;
+    padding: 12px 8px;
+    font-size: 0.85rem;
     color: #1F497D;
-    margin-bottom: 8px;
+    font-weight: 600;
   }
+  .info-item span { display: block; font-size: 1.3rem; font-weight: bold; color: #ED7D31; }
 
-  #start-screen p {
-    color: #555;
-    font-size: 0.92rem;
-    margin-bottom: 24px;
-    line-height: 1.5;
+  .scale-box {
+    background: #f0f4f8;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    text-align: left;
+    font-size: 0.85rem;
+    color: #444;
+    line-height: 1.8;
   }
+  .scale-box strong { color: #1F497D; display: block; margin-bottom: 4px; }
 
-  #start-screen input {
+  input[type=text] {
     width: 100%;
     padding: 13px 16px;
-    border: 2px solid #d0dce8;
+    border: 2px solid #BDD7EE;
     border-radius: 10px;
     font-size: 1rem;
+    margin-bottom: 16px;
     outline: none;
-    transition: border-color 0.2s;
-    margin-bottom: 14px;
+    transition: border 0.2s;
   }
+  input[type=text]:focus { border-color: #2E74B5; }
+  input[type=text].error { border-color: #e74c3c; }
 
-  #start-screen input:focus { border-color: #2e86de; }
-
-  #start-screen input.error { border-color: #e17055; }
-
-  .error-msg {
-    color: #e17055;
-    font-size: 0.83rem;
-    margin-top: -10px;
-    margin-bottom: 10px;
+  .name-error {
+    color: #e74c3c;
+    font-size: 0.85rem;
+    margin-top: -12px;
+    margin-bottom: 12px;
     display: none;
   }
+  .name-error.show { display: block; }
 
-  .error-msg.show { display: block; }
-
-  .btn-start {
+  .btn {
+    display: block;
     width: 100%;
     padding: 14px;
-    background: linear-gradient(135deg, #1F497D, #2e86de);
-    color: white;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     font-size: 1.05rem;
-    font-weight: 700;
+    font-weight: bold;
     cursor: pointer;
-    transition: opacity 0.2s;
+    transition: transform 0.1s, opacity 0.2s;
   }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: linear-gradient(135deg, #1F497D, #2E74B5); color: white; }
+  .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
 
-  .btn-start:active { opacity: 0.85; }
-
-  /* ── Question cards ── */
+  /* Въпроси */
   .question-card {
-    background: white;
-    border-radius: 14px;
-    padding: 20px 18px;
-    margin-bottom: 18px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
     display: none;
+    background: white;
+    border-radius: 16px;
+    padding: 22px 18px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.09);
+    margin-bottom: 16px;
   }
-
   .question-card.active { display: block; }
 
-  .q-number {
-    font-size: 0.75rem;
-    color: #2e86de;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 8px;
-  }
+  .q-number { color: #888; font-size: 0.82rem; margin-bottom: 6px; font-weight: 600; }
+  .q-text { font-size: 1rem; font-weight: 600; line-height: 1.55; color: #1a1a2e; margin-bottom: 16px; }
 
-  .q-text {
-    font-size: 1rem;
-    font-weight: 600;
-    line-height: 1.5;
-    margin-bottom: 16px;
-    white-space: pre-line;
-  }
-
-  .options { display: flex; flex-direction: column; gap: 10px; }
+  .options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
 
   .option {
     display: flex;
     align-items: flex-start;
     gap: 12px;
+    background: #f8fafc;
+    border: 2px solid #e0e8f0;
+    border-radius: 12px;
     padding: 13px 14px;
-    border: 2px solid #e0e7ef;
-    border-radius: 10px;
     cursor: pointer;
-    transition: all 0.2s;
-    background: #fafcff;
-    font-size: 0.95rem;
-    line-height: 1.4;
+    transition: border 0.18s, background 0.18s;
     -webkit-tap-highlight-color: transparent;
-    user-select: none;
   }
-
-  .option:active { transform: scale(0.98); }
-
+  .option.selected { border-color: #2E74B5; background: #e8f1fb; }
   .radio-dot {
     width: 20px;
     height: 20px;
-    min-width: 20px;
-    border: 2px solid #b0bec5;
     border-radius: 50%;
-    margin-top: 1px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
+    border: 2px solid #b0c4d8;
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: border 0.15s, background 0.15s;
   }
+  .option.selected .radio-dot { border-color: #2E74B5; background: #2E74B5; }
+  .option span:last-child { font-size: 0.92rem; line-height: 1.45; color: #2a2a3e; }
 
-  .radio-dot::after {
-    content: '';
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: white;
-    display: none;
-  }
-
-  .option.selected {
-    border-color: #2e86de;
-    background: #e8f1fb;
-  }
-
-  .option.selected .radio-dot {
-    border-color: #2e86de;
-    background: #2e86de;
-  }
-
-  .option.selected .radio-dot::after { display: block; }
-
-  .nav-buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 18px;
-    justify-content: flex-end;
-  }
-
-  .btn {
-    padding: 12px 22px;
-    border: none;
-    border-radius: 10px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .btn-primary {
-    background: #2e86de;
+  .nav-buttons { text-align: right; }
+  .btn-next {
+    display: inline-block;
+    width: auto;
+    padding: 12px 28px;
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
     color: white;
-    flex: 1;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
   }
+  .btn-next:disabled { opacity: 0.4; cursor: not-allowed; }
 
-  .btn-primary:hover { background: #1F497D; }
-  .btn-primary:active { transform: scale(0.97); }
-  .btn-primary:disabled { background: #b0bec5; cursor: default; }
+  /* Резултати */
+  #screen-result { padding: 24px 18px; max-width: 640px; margin: 0 auto; display: none; }
+  #screen-result.show { display: block; }
 
-  /* ── Result screen ── */
-  #result-screen {
-    display: none;
+  .result-card {
     background: white;
-    border-radius: 14px;
-    padding: 30px 20px;
+    border-radius: 16px;
+    padding: 28px 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.10);
     text-align: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
-    margin-top: 20px;
+    margin-bottom: 16px;
   }
-
-  #result-screen.show { display: block; }
-
   .score-circle {
-    width: 130px;
-    height: 130px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
+    margin: 0 auto 16px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 20px;
-    font-size: 2.1rem;
-    font-weight: 700;
+    font-weight: bold;
+    color: white;
+    font-size: 1.7rem;
+    line-height: 1.1;
   }
-
-  .score-circle span { font-size: 0.78rem; font-weight: 500; margin-top: 2px; }
-
-  .grade-A { background: #e8faf4; color: #00b894; }
-  .grade-B { background: #e8f1fb; color: #2e86de; }
-  .grade-C { background: #fff8e1; color: #f9a825; }
-  .grade-D { background: #fdf0ee; color: #e17055; }
-
-  #result-screen h2 { font-size: 1.3rem; margin-bottom: 6px; }
-  #result-screen .student-name { font-size: 1rem; color: #555; margin-bottom: 6px; }
-  #result-screen p  { color: #555; font-size: 0.95rem; margin-bottom: 16px; white-space: pre-line; }
+  .score-circle span { font-size: 0.78rem; font-weight: 400; }
+  .grade-A { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+  .grade-B { background: linear-gradient(135deg, #2E74B5, #5ba4d4); }
+  .grade-C { background: linear-gradient(135deg, #ED7D31, #f0a060); }
+  .grade-D { background: linear-gradient(135deg, #c0392b, #e74c3c); }
 
   .grade-badge {
     display: inline-block;
-    font-size: 1.6rem;
-    font-weight: 800;
-    padding: 8px 24px;
-    border-radius: 12px;
-    margin-bottom: 16px;
-  }
-
-  .grade-badge.grade-A { background: #e8faf4; color: #00b894; }
-  .grade-badge.grade-B { background: #e8f1fb; color: #2e86de; }
-  .grade-badge.grade-C { background: #fff8e1; color: #f9a825; }
-  .grade-badge.grade-D { background: #fdf0ee; color: #e17055; }
-
-  .btn-send {
-    background: linear-gradient(135deg, #1F497D, #2e86de);
+    padding: 6px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 1.1rem;
     color: white;
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 10px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 6px;
-  }
-
-  #review-list {
-    margin: 16px 0 8px;
-  }
-
-  #review-list h3 {
-    text-align: center;
-    font-size: 0.85rem;
-    color: #888;
-    font-weight: 500;
     margin-bottom: 12px;
   }
 
-  .dots-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    justify-content: center;
+  .result-name { font-size: 1.1rem; font-weight: 700; color: #1F497D; margin-bottom: 4px; }
+  .result-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 8px; }
+  .result-sub { color: #666; font-size: 0.9rem; white-space: pre-line; margin-bottom: 8px; }
+
+  .force-warn {
+    background: #c0392b;
+    color: white;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin: 10px 0;
+    font-weight: bold;
+    font-size: 0.92rem;
+    display: none;
   }
 
+  #send-status {
+    font-size: 0.88rem;
+    color: #888;
+    margin-top: 10px;
+    min-height: 22px;
+  }
+
+  #review-list {
+    background: white;
+    border-radius: 16px;
+    padding: 18px 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    margin-bottom: 16px;
+  }
+  #review-list h3 {
+    text-align: center;
+    font-size: 0.88rem;
+    color: #888;
+    margin-bottom: 14px;
+    font-weight: 500;
+  }
+  .dots-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
   .dot-item {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 700;
     color: white;
   }
-
   .dot-item.correct { background: #27ae60; }
   .dot-item.wrong   { background: #e74c3c; }
   .dot-item.skipped { background: #bbb; }
 
-  .btn-retry {
-    background: #eef2f7;
-    color: #1F497D;
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 10px;
-    font-size: 0.92rem;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 8px;
-  }
+  footer { text-align: center; padding: 18px; color: #aaa; font-size: 0.78rem; }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>Тест – 2 Модул &nbsp;·&nbsp; ООП с C#</h1>
-  <p id="header-sub">20 въпроса с избор</p>
-  <div id="timer" style="display:none;">⏱ 20:00</div>
-  <div id="progress-bar-wrap"><div id="progress-bar"></div></div>
-  <div id="progress-text"></div>
+  <h1>📚 Тест — 2 Модул<br><small style="font-weight:400;font-size:0.82rem;">Разработка на софтуер · 11 клас</small></h1>
+  <div id="timer">--:--</div>
 </header>
+<div id="progress-wrap"><div id="progress-bar"></div></div>
+<div id="progress-text"></div>
 
-<!-- Start screen -->
-<div id="start-screen">
-  <h2>📝 Тест – 2 Модул</h2>
-  <p>Въведи своето име и натисни <strong>Започни</strong>, за да влезеш в теста.<br>20 въпроса с избор.</p>
-  <input type="text" id="name-input" placeholder="Например: Иван Иванов" autocomplete="off">
-  <div class="error-msg" id="name-error">Моля, въведи своето име.</div>
-  <button class="btn-start" onclick="startQuiz()">Започни теста →</button>
+<!-- Начален екран -->
+<div id="screen-start" class="screen active">
+  <div class="card">
+    <h2>Здравейте! 👋</h2>
+    <p>Преди да започнете, въведете вашето <strong>пълно име</strong>.</p>
 
-  <div style="margin-top:22px; border-top:1px solid #e8eef4; padding-top:16px; text-align:left;">
-    <div style="font-size:0.78rem; font-weight:700; color:#888; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;">Скала на оценките</div>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:7px;">
-      <div style="background:#e8faf4; color:#00b894; border-radius:8px; padding:8px 12px; font-weight:700; font-size:0.92rem;">Оценка 6 &nbsp;·&nbsp; 90–100%</div>
-      <div style="background:#e8f1fb; color:#2e86de; border-radius:8px; padding:8px 12px; font-weight:700; font-size:0.92rem;">Оценка 5 &nbsp;·&nbsp; 75–89%</div>
-      <div style="background:#fff8e1; color:#f9a825; border-radius:8px; padding:8px 12px; font-weight:700; font-size:0.92rem;">Оценка 4 &nbsp;·&nbsp; 55–74%</div>
-      <div style="background:#fff8e1; color:#e67e22; border-radius:8px; padding:8px 12px; font-weight:700; font-size:0.92rem;">Оценка 3 &nbsp;·&nbsp; 40–54%</div>
-      <div style="background:#fdf0ee; color:#e17055; border-radius:8px; padding:8px 12px; font-weight:700; font-size:0.92rem; grid-column:1/-1;">Оценка 2 &nbsp;·&nbsp; под 40%</div>
+    <div class="info-grid">
+      <div class="info-item"><span>20</span>въпроса</div>
+      <div class="info-item"><span>20'</span>времетраене</div>
+      <div class="info-item"><span>4</span>варианта</div>
+      <div class="info-item"><span>1×</span>само напред</div>
     </div>
+
+    <div class="scale-box">
+      <strong>Скала за оценяване:</strong>
+      0 – 9 т. → Слаб (2) &nbsp;|&nbsp; 10 – 12 т. → Среден (3)<br>
+      13 – 15 т. → Добър (4) &nbsp;|&nbsp; 16 – 18 т. → Мн. добър (5)<br>
+      19 – 20 т. → Отличен (6)
+    </div>
+
+    <input type="text" id="name-input" placeholder="Иван Иванов" maxlength="60"
+           autocomplete="off" autocorrect="off" spellcheck="false">
+    <div class="name-error" id="name-error">Моля въведете вашето пълно име.</div>
+
+    <button class="btn btn-primary" id="btn-start" onclick="startQuiz()">
+      Старт на теста →
+    </button>
   </div>
 </div>
 
-<!-- Quiz -->
-<main id="quiz-main" style="display:none;"></main>
+<!-- Въпроси -->
+<div id="screen-quiz" class="screen">
+  <div id="quiz-main"></div>
+</div>
 
-<!-- Result -->
-<div id="result-screen">
-  <div id="score-circle" class="score-circle"></div>
-  <div class="student-name" id="result-name"></div>
-  <h2 id="result-title"></h2>
-  <div id="grade-badge" class="grade-badge"></div>
-  <p id="result-sub"></p>
+<!-- Резултати -->
+<div id="screen-result">
+  <div class="result-card">
+    <div class="score-circle" id="score-circle"></div>
+    <div class="grade-badge" id="grade-badge"></div>
+    <div class="result-name" id="result-name"></div>
+    <div class="result-title" id="result-title"></div>
+    <div class="force-warn" id="force-warn"></div>
+    <div class="result-sub" id="result-sub"></div>
+    <div id="send-status">⏳ Изпращане на резултати...</div>
+  </div>
   <div id="review-list"></div>
-  <div id="send-status" style="font-size:0.88rem; color:#888; margin-top:10px; min-height:20px;"></div>
-  <button class="btn-retry" onclick="restartQuiz()">🔄 Опитай отново</button>
+  <footer>ПМГ „Иван Вазов" — Добрич</footer>
 </div>
 
 <script>
-const questions = [
+const ALL_QUESTIONS = [
   {
-    q: "1. Какво означава предефиниране (override) на метод?",
-    options: [
-      "А) Дефиниране на метод с едно и също ime, но различни параметри",
-      "Б) Дефиниране на метод в наследник клас, замества метод от базов клас",
-      "В) Извикване на метод от друг клас",
-      "Г) Задаване на стойност по подразбиране на параметър"
+    q: "Какво означава предефиниране (override) на метод?",
+    opts: [
+      "Дефиниране на метод с едно и също ime, но различни параметри",
+      "Дефиниране на метод в наследник клас, замества метод от базов клас",
+      "Извикване на метод от друг клас",
+      "Задаване на стойност по подразбиране на параметър"
     ],
-    answer: 1
+    correct: 1
   },
   {
-    q: "2. Какво означава претоварване (overload) на метод?",
-    options: [
-      "А) Метод в наследник клас с ключовата дума override",
-      "Б) Метод, който не може да се извика",
-      "В) Методи с едно и също ime, но различен брой или тип параметри",
-      "Г) Метод, наследен без промени от базов клас"
+    q: "Какво означава претоварване (overload) на метод?",
+    opts: [
+      "Метод в наследник клас с ключовата дума override",
+      "Метод, който не може да се извика",
+      "Методи с едно и също ime, но различен брой или тип параметри",
+      "Метод, наследен без промени от базов клас"
     ],
-    answer: 2
+    correct: 2
   },
   {
-    q: "3. Кой е задължителният елемент при всяка рекурсивна функция?",
-    options: [
-      "А) Цикъл for в тялото на функцията",
-      "Б) Гранично условие (base case), при което рекурсията спира",
-      "В) Параметър от тип string",
-      "Г) Извикване на метода Main()"
+    q: "Кой е задължителният елемент при всяка рекурсивна функция?",
+    opts: [
+      "Цикъл for в тялото на функцията",
+      "Гранично условие (base case), при което рекурсията спира",
+      "Параметър от тип string",
+      "Извикване на метода Main()"
     ],
-    answer: 1
+    correct: 1
   },
   {
-    q: "4. Какъв е резултатът от Fact(4),\nако Fact(0)=1 и Fact(n)=n*Fact(n-1)?",
-    options: ["А) 4", "Б) 8", "В) 16", "Г) 24"],
-    answer: 3
+    q: "Какъв е резултатът от Fact(4),\nако Fact(0)=1 и Fact(n)=n*Fact(n-1)?",
+    opts: ["4", "8", "16", "24"],
+    correct: 3
   },
   {
-    q: "5. Кое твърдение за рекурсията е ВЯРНО?",
-    options: [
-      "А) Рекурсивните алгоритми винаги са по-бързи от итеративните",
-      "Б) Рекурсията не може да се замени с цикъл",
-      "В) При всяко рекурсивно извикване се заделя нова памет в стека",
-      "Г) Рекурсивен метод не може да има параметри"
+    q: "Кое твърдение за рекурсията е ВЯРНО?",
+    opts: [
+      "Рекурсивните алгоритми винаги са по-бързи от итеративните",
+      "Рекурсията не може да се замени с цикъл",
+      "При всяко рекурсивно извикване се заделя нова памет в стека",
+      "Рекурсивен метод не може да има параметри"
     ],
-    answer: 2
+    correct: 2
   },
   {
-    q: '6. Какво връща s.Length,\nако s = "Hello"?',
-    options: ["А) 4", "Б) 5", "В) 6", "Г) Грешка при компилация"],
-    answer: 1
+    q: 'Какво връща s.Length,\nако s = "Hello"?',
+    opts: ["4", "5", "6", "Грешка при компилация"],
+    correct: 1
   },
   {
-    q: '7. Кой символ се получава при s[0],\nако s = "Програмиране"?',
-    options: ["А) 'а'", "Б) 'П'", "В) 'е'", "Г) s[0] е грешка за string"],
-    answer: 1
+    q: 'Кой символ се получава при s[0],\nако s = "Програмиране"?',
+    opts: ["'а'", "'П'", "'е'", "s[0] е грешка за string"],
+    correct: 1
   },
   {
-    q: "8. Кой метод преобразува символ c в главна буква?",
-    options: [
-      "А) char.IsDigit(c)",
-      "Б) char.ToLower(c)",
-      "В) char.ToUpper(c)",
-      "Г) char.IsLetter(c)"
+    q: "Кой метод преобразува символ c в главна буква?",
+    opts: [
+      "char.IsDigit(c)",
+      "char.ToLower(c)",
+      "char.ToUpper(c)",
+      "char.IsLetter(c)"
     ],
-    answer: 2
+    correct: 2
   },
   {
-    q: "9. Как се декларира двумерен масив от int с 3 реда и 4 колони?",
-    options: [
-      "А) int[] matrix = new int[3, 4];",
-      "Б) int[,] matrix = new int[3, 4];",
-      "В) int[][] matrix = new int[3][4];",
-      "Г) int[3,4] matrix = new int[];"
+    q: "Как се декларира двумерен масив от int с 3 реда и 4 колони?",
+    opts: [
+      "int[] matrix = new int[3, 4];",
+      "int[,] matrix = new int[3, 4];",
+      "int[][] matrix = new int[3][4];",
+      "int[3,4] matrix = new int[];"
     ],
-    answer: 1
+    correct: 1
   },
   {
-    q: "10. Какво връща matrix.GetLength(0) за двумерен масив?",
-    options: [
-      "А) Броя на колоните",
-      "Б) Общия брой елементи",
-      "В) Броя на редовете",
-      "Г) Стойността на matrix[0,0]"
+    q: "Какво връща matrix.GetLength(0) за двумерен масив?",
+    opts: [
+      "Броя на колоните",
+      "Общия брой елементи",
+      "Броя на редовете",
+      "Стойността на matrix[0,0]"
     ],
-    answer: 2
+    correct: 2
   },
   {
-    q: "11. Кой вложен цикъл правилно обхожда двумерен масив с m реда и n колони?",
-    options: [
-      "А) for (int i = 0; i < matrix.Length; i++)",
-      "Б) for (int i=0; i<m; i++)\n    for (int j=0; j<n; j++)",
-      "В) foreach (var row in matrix)",
-      "Г) for (int i=1; i<=m; i++)\n    for (int j=1; j<=n; j++)"
+    q: "Кой вложен цикъл правилно обхожда двумерен масив с m реда и n колони?",
+    opts: [
+      "for (int i = 0; i < matrix.Length; i++)",
+      "for (int i=0; i<m; i++)\n    for (int j=0; j<n; j++)",
+      "foreach (var row in matrix)",
+      "for (int i=1; i<=m; i++)\n    for (int j=1; j<=n; j++)"
     ],
-    answer: 1
+    correct: 1
   },
   {
-    q: "12. Кой принцип описва структурата Stack?",
-    options: [
-      "А) FIFO – First In, First Out",
-      "Б) LIFO – Last In, First Out",
-      "В) Произволен достъп по индекс",
-      "Г) Двупосочна наредена структура"
+    q: "Кой принцип описва структурата Stack?",
+    opts: [
+      "FIFO – First In, First Out",
+      "LIFO – Last In, First Out",
+      "Произволен достъп по индекс",
+      "Двупосочна наредена структура"
     ],
-    answer: 1
+    correct: 1
   },
   {
-    q: "13. Кой метод добавя елемент в Stack?",
-    options: ["А) Enqueue()", "Б) Add()", "В) Push()", "Г) Insert()"],
-    answer: 2
+    q: "Кой метод добавя елемент в Stack?",
+    opts: ["Enqueue()", "Add()", "Push()", "Insert()"],
+    correct: 2
   },
   {
-    q: "14. Кой принцип описва структурата Queue?",
-    options: [
-      "А) LIFO – Last In, First Out",
-      "Б) FIFO – First In, First Out",
-      "В) Произволен достъп по индекс",
-      "Г) Сортирана наредба"
+    q: "Кой принцип описва структурата Queue?",
+    opts: [
+      "LIFO – Last In, First Out",
+      "FIFO – First In, First Out",
+      "Произволен достъп по индекс",
+      "Сортирана наредба"
     ],
-    answer: 1
+    correct: 1
   },
   {
-    q: "15. Stack<int> s съдържа 1,2,3,4,5\n(5 е последно добавен).\nКакво извежда Console.Write(s.Peek())?",
-    options: ["А) 1", "Б) 3", "В) 5", "Г) Грешка при компилация"],
-    answer: 2
+    q: "Stack<int> s съдържа 1,2,3,4,5\n(5 е последно добавен).\nКакво извежда Console.Write(s.Peek())?",
+    opts: ["1", "3", "5", "Грешка при компилация"],
+    correct: 2
   },
   {
-    q: "16. Каква е сложността на:\nfor(int i=0; i<n; i++) sum+=i;",
-    options: [
-      "А) O(1) – константна",
-      "Б) O(log n) – логаритмична",
-      "В) O(n) – линейна",
-      "Г) O(n²) – квадратична"
+    q: "Каква е сложността на:\nfor(int i=0; i<n; i++) sum+=i;",
+    opts: [
+      "O(1) – константна",
+      "O(log n) – логаритмична",
+      "O(n) – линейна",
+      "O(n²) – квадратична"
     ],
-    answer: 2
+    correct: 2
   },
   {
-    q: "17. Каква е сложността на алгоритъм с два вложени цикъла от 1 до n?",
-    options: ["А) O(1)", "Б) O(n)", "В) O(n²)", "Г) O(2n)"],
-    answer: 2
+    q: "Каква е сложността на алгоритъм с два вложени цикъла от 1 до n?",
+    opts: ["O(1)", "O(n)", "O(n²)", "O(2n)"],
+    correct: 2
   },
   {
-    q: "18. Кой диалогов прозорец се използва за избор на файл за отваряне?",
-    options: [
-      "А) saveFileDialog",
-      "Б) folderBrowserDialog",
-      "В) openFileDialog",
-      "Г) MessageBox"
+    q: "Кой диалогов прозорец се използва за избор на файл за отваряне?",
+    opts: [
+      "saveFileDialog",
+      "folderBrowserDialog",
+      "openFileDialog",
+      "MessageBox"
     ],
-    answer: 2
+    correct: 2
   },
   {
-    q: "19. Какво проверява методът char.IsDigit(c)?",
-    options: [
-      "А) Дали символът е буква",
-      "Б) Дали символът е главна буква",
-      "В) Дали символът е цифра",
-      "Г) Дали символът е интервал"
+    q: "Какво проверява методът char.IsDigit(c)?",
+    opts: [
+      "Дали символът е буква",
+      "Дали символът е главна буква",
+      "Дали символът е цифра",
+      "Дали символът е интервал"
     ],
-    answer: 2
+    correct: 2
   },
   {
-    q: "20. Кое твърдение за конструктора на клас е ВЯРНО?",
-    options: [
-      "А) Може да се предефинира с override",
-      "Б) Извиква се автоматично при създаване на обект с new",
-      "В) Задължително връща стойност",
-      "Г) Може да бъде static метод"
+    q: "Кое твърдение за конструктора на клас е ВЯРНО?",
+    opts: [
+      "Може да се предефинира с override",
+      "Извиква се автоматично при създаване на обект с new",
+      "Задължително връща стойност",
+      "Може да бъде static метод"
     ],
-    answer: 1
+    correct: 1
   }
 ];
 
-let current = 0;
-let userAnswers = new Array(questions.length).fill(-1);
+const TOTAL_TIME = 20 * 60;
+
+let questions = [];
+let optOrder  = [];
+let current   = 0;
+let answers   = [];
+let timerInt  = null;
+let timeLeft  = TOTAL_TIME;
 let studentName = '';
-let shuffledQuestions = [];
-let timerInterval = null;
-let secondsLeft = 20 * 60;
+let quizActive  = false;
 
 function shuffle(arr) {
   const a = [...arr];
@@ -605,105 +543,79 @@ function shuffle(arr) {
   return a;
 }
 
-function prepareQuestions() {
-  shuffledQuestions = shuffle(questions).map(q => {
-    const correctText = q.options[q.answer];
-    const shuffledOpts = shuffle(q.options);
-    return {
-      q: q.q,
-      options: shuffledOpts,
-      answer: shuffledOpts.indexOf(correctText)
-    };
-  });
-}
-
 function startQuiz() {
   const input = document.getElementById('name-input');
   const err   = document.getElementById('name-error');
   const name  = input.value.trim();
-
-  if (!name) {
+  if (name.length < 3) {
     input.classList.add('error');
     err.classList.add('show');
     input.focus();
     return;
   }
-
   studentName = name;
+  const qOrder = shuffle([...Array(ALL_QUESTIONS.length).keys()]);
+  questions = qOrder.map(i => ALL_QUESTIONS[i]);
+  answers   = new Array(questions.length).fill(-1);
+  optOrder  = questions.map(q => shuffle([...Array(q.opts.length).keys()]));
   quizActive = true;
-  secondsLeft = 20 * 60;
-  prepareQuestions();
-  userAnswers = new Array(shuffledQuestions.length).fill(-1);
-  document.getElementById('start-screen').style.display = 'none';
-  document.getElementById('quiz-main').style.display = '';
-  document.getElementById('header-sub').textContent = name;
+  timeLeft   = TOTAL_TIME;
+  document.getElementById('screen-start').classList.remove('active');
+  document.getElementById('screen-quiz').classList.add('active');
   buildQuiz();
-  updateProgress();
+  updateProgress(0);
   startTimer();
-}
-
-function startTimer() {
-  const el = document.getElementById('timer');
-  el.style.display = 'inline-block';
-  updateTimerDisplay();
-
-  timerInterval = setInterval(() => {
-    secondsLeft--;
-    updateTimerDisplay();
-
-    if (secondsLeft <= 0) {
-      clearInterval(timerInterval);
-      timerInterval = null;
-      if (quizActive) {
-        quizActive = false;
-        showResults('time');
-      }
-    }
-  }, 1000);
-}
-
-function updateTimerDisplay() {
-  const el = document.getElementById('timer');
-  const m = Math.floor(secondsLeft / 60);
-  const s = secondsLeft % 60;
-  el.textContent = '⏱ ' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
-
-  el.classList.remove('warning', 'danger');
-  if (secondsLeft <= 60)       el.classList.add('danger');
-  else if (secondsLeft <= 300) el.classList.add('warning');
 }
 
 document.getElementById('name-input').addEventListener('input', function() {
   this.classList.remove('error');
   document.getElementById('name-error').classList.remove('show');
 });
-
 document.getElementById('name-input').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') startQuiz();
 });
 
+function startTimer() {
+  const el = document.getElementById('timer');
+  el.style.display = 'inline-block';
+  updateTimerDisplay();
+  timerInt = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+    if (timeLeft <= 0) { clearInterval(timerInt); timerInt = null; if (quizActive) finishQuiz('time'); }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const m = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+  const s = String(timeLeft % 60).padStart(2, '0');
+  const el = document.getElementById('timer');
+  el.textContent = '⏱ ' + m + ':' + s;
+  el.classList.toggle('warning', timeLeft <= 60);
+}
+
 function buildQuiz() {
   const main = document.getElementById('quiz-main');
   main.innerHTML = '';
-  shuffledQuestions.forEach((q, idx) => {
+  questions.forEach((q, idx) => {
     const card = document.createElement('div');
     card.className = 'question-card' + (idx === 0 ? ' active' : '');
     card.id = 'q-' + idx;
 
-    const opts = q.options.map((opt, oi) => `
-      <label class="option" id="opt-${idx}-${oi}" onclick="selectOption(${idx}, ${oi})">
+    const opts = optOrder[idx].map((origIdx, displayPos) => `
+      <label class="option" id="opt-${idx}-${displayPos}" onclick="selectOption(${idx}, ${displayPos}, ${origIdx})">
         <span class="radio-dot"></span>
-        <span>${opt.replace(/\n/g, '<br>')}</span>
+        <span>${q.opts[origIdx].replace(/\n/g, '<br>')}</span>
       </label>
     `).join('');
 
     card.innerHTML = `
-      <div class="q-number">Въпрос ${idx+1} от ${shuffledQuestions.length}</div>
+      <div class="q-number">Въпрос ${idx+1} от ${questions.length}</div>
       <div class="q-text">${q.q.replace(/\n/g, '<br>')}</div>
       <div class="options">${opts}</div>
       <div class="nav-buttons">
-        <button class="btn btn-primary" id="btn-${idx}" onclick="nextQuestion(${idx})" disabled>
-          ${idx < shuffledQuestions.length - 1 ? 'Следващ →' : 'Завърши теста'}
+        <button class="btn-next" id="btn-${idx}" onclick="nextQuestion(${idx})" disabled>
+          ${idx < questions.length - 1 ? 'Следващ →' : 'Завърши теста ✓'}
         </button>
       </div>
     `;
@@ -711,68 +623,58 @@ function buildQuiz() {
   });
 }
 
-function selectOption(qIdx, optIdx) {
-  userAnswers[qIdx] = optIdx;
-
-  for (let i = 0; i < questions[qIdx].options.length; i++) {
-    document.getElementById('opt-' + qIdx + '-' + i).classList.remove('selected');
+function selectOption(qIdx, displayPos, origIdx) {
+  for (let i = 0; i < 4; i++) {
+    const el = document.getElementById('opt-' + qIdx + '-' + i);
+    if (el) el.classList.remove('selected');
   }
-  document.getElementById('opt-' + qIdx + '-' + optIdx).classList.add('selected');
+  document.getElementById('opt-' + qIdx + '-' + displayPos).classList.add('selected');
+  answers[qIdx] = origIdx;
   document.getElementById('btn-' + qIdx).disabled = false;
 }
 
 function nextQuestion(qIdx) {
-  if (userAnswers[qIdx] === -1) return;
-
-  if (qIdx < shuffledQuestions.length - 1) {
+  if (answers[qIdx] === -1) return;
+  if (qIdx < questions.length - 1) {
     document.getElementById('q-' + qIdx).classList.remove('active');
     current = qIdx + 1;
     document.getElementById('q-' + current).classList.add('active');
     document.getElementById('q-' + current).scrollIntoView({ behavior: 'smooth', block: 'start' });
-    updateProgress();
+    updateProgress(current);
   } else {
-    quizActive = false;
-    showResults(false);
+    finishQuiz(false);
   }
 }
 
-function updateProgress() {
-  const pct = Math.round((current / shuffledQuestions.length) * 100);
+function updateProgress(idx) {
+  const pct = Math.round((idx / questions.length) * 100);
   document.getElementById('progress-bar').style.width = pct + '%';
-  document.getElementById('progress-text').textContent =
-    'Въпрос ' + (current + 1) + ' от ' + shuffledQuestions.length;
+  document.getElementById('progress-text').textContent = 'Въпрос ' + (idx + 1) + ' от ' + questions.length;
 }
 
-let lastScore = 0;
-let lastPct = 0;
-let lastGradeClass = '';
-let lastGradeNum = 0;
-let wasAutoSubmit = false;
-
-function calcGrade(pct) {
-  if (pct >= 90) return 6;
-  if (pct >= 75) return 5;
-  if (pct >= 55) return 4;
-  if (pct >= 40) return 3;
+function calcGrade(correct) {
+  if (correct >= 19) return 6;
+  if (correct >= 16) return 5;
+  if (correct >= 13) return 4;
+  if (correct >= 10) return 3;
   return 2;
 }
 
-function showResults(autoSubmit) {
-  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+function finishQuiz(forceReason) {
+  if (!quizActive) return;
+  quizActive = false;
+  if (timerInt) { clearInterval(timerInt); timerInt = null; }
+
   document.getElementById('timer').style.display = 'none';
-  wasAutoSubmit = autoSubmit;
-  document.getElementById('quiz-main').style.display = 'none';
-  const result = document.getElementById('result-screen');
-  result.classList.add('show');
+  document.getElementById('screen-quiz').classList.remove('active');
+  document.getElementById('progress-bar').style.width = '100%';
+  document.getElementById('progress-text').textContent = 'Предаден';
 
-  let score = 0;
-  shuffledQuestions.forEach((q, i) => { if (userAnswers[i] === q.answer) score++; });
-  lastScore = score;
+  let correct = 0;
+  questions.forEach((q, i) => { if (answers[i] === q.correct) correct++; });
 
-  const pct = Math.round((score / shuffledQuestions.length) * 100);
-  lastPct = pct;
-  const grade = calcGrade(pct);
-  lastGradeNum = grade;
+  const pct = Math.round((correct / questions.length) * 100);
+  const grade = calcGrade(correct);
 
   let gradeClass, gradeText, emoji;
   if (grade >= 6)      { gradeClass = 'grade-A'; gradeText = 'Отличен!'; emoji = '🏆'; }
@@ -780,137 +682,94 @@ function showResults(autoSubmit) {
   else if (grade >= 4) { gradeClass = 'grade-C'; gradeText = 'Добър'; emoji = '📚'; }
   else if (grade >= 3) { gradeClass = 'grade-C'; gradeText = 'Среден'; emoji = '📖'; }
   else                 { gradeClass = 'grade-D'; gradeText = 'Слаб'; emoji = '❌'; }
-  lastGradeClass = gradeClass;
 
-  const circle = document.getElementById('score-circle');
-  circle.className = 'score-circle ' + gradeClass;
-  circle.innerHTML = score + '/' + questions.length + '<span>' + pct + '%</span>';
+  document.getElementById('score-circle').className = 'score-circle ' + gradeClass;
+  document.getElementById('score-circle').innerHTML = correct + '/' + questions.length + '<br><span>' + pct + '%</span>';
 
-  const badge = document.getElementById('grade-badge');
-  badge.className = 'grade-badge ' + gradeClass;
-  badge.textContent = 'Оценка: ' + grade;
+  document.getElementById('grade-badge').className = 'grade-badge ' + gradeClass;
+  document.getElementById('grade-badge').textContent = 'Оценка: ' + grade;
 
   document.getElementById('result-name').textContent = studentName;
   document.getElementById('result-title').textContent = emoji + ' ' + gradeText;
 
-  let subText;
-  if (autoSubmit === 'time')
-    subText = '⏱ Времето изтече — тестът беше предаден автоматично.\nВерни отговори: ' + score + ' от ' + shuffledQuestions.length;
-  else if (autoSubmit)
-    subText = '⚠️ Тестът беше предаден автоматично (напуснахте екрана).\nВерни отговори: ' + score + ' от ' + shuffledQuestions.length;
-  else
-    subText = 'Верни отговори: ' + score + ' от ' + shuffledQuestions.length;
-  document.getElementById('result-sub').textContent = subText;
+  let forceMsg = '';
+  if (forceReason === 'time')  forceMsg = '⏱ Времето изтече — тестът е предаден автоматично.';
+  else if (forceReason)        forceMsg = '⚠️ Напуснахте екрана — тестът е предаден автоматично.';
 
-  document.getElementById('progress-bar').style.width = '100%';
-  document.getElementById('progress-text').textContent = 'Предаден';
+  const warnEl = document.getElementById('force-warn');
+  if (forceMsg) { warnEl.style.display = 'block'; warnEl.textContent = forceMsg; }
 
-  buildReviewDots();
+  document.getElementById('result-sub').textContent = 'Верни отговори: ' + correct + ' от ' + questions.length;
 
-  result.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-  sendResults();
-}
-
-function buildReviewDots() {
   const list = document.getElementById('review-list');
   list.innerHTML = '<h3>Преглед на отговорите</h3><div class="dots-grid"></div>';
   const grid = list.querySelector('.dots-grid');
-
-  shuffledQuestions.forEach((q, i) => {
+  questions.forEach((q, i) => {
     const dot = document.createElement('div');
-    if (userAnswers[i] < 0)
-      dot.className = 'dot-item skipped';
-    else
-      dot.className = 'dot-item ' + (userAnswers[i] === q.answer ? 'correct' : 'wrong');
+    dot.className = 'dot-item ' + (answers[i] < 0 ? 'skipped' : answers[i] === q.correct ? 'correct' : 'wrong');
     dot.textContent = i + 1;
     grid.appendChild(dot);
   });
+
+  document.getElementById('screen-result').classList.add('show');
+  document.getElementById('screen-result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  sendResults(correct, pct, grade, forceMsg);
 }
 
-function sendResults() {
-  const detailLines = shuffledQuestions.map((q, i) => {
-    const isOk = userAnswers[i] === q.answer;
-    const given = userAnswers[i] >= 0 ? q.options[userAnswers[i]] : '(без отговор)';
-    const right = q.options[q.answer];
-    return (isOk ? '✔' : '✘') + ' В' + (i + 1) + ': ' + q.q
+function sendResults(correct, pct, grade, forceMsg) {
+  const detailLines = questions.map((q, i) => {
+    const isOk = answers[i] === q.correct;
+    const given = answers[i] >= 0 ? q.opts[answers[i]] : '(без отговор)';
+    const right = q.opts[q.correct];
+    return (isOk ? '✔' : '✘') + ' В' + (i+1) + ': ' + q.q
       + '\n   Отговор: ' + given
       + (isOk ? '' : '\n   Верен: ' + right);
   }).join('\n\n');
 
   const now = new Date().toLocaleString('bg-BG', { timeZone: 'Europe/Sofia' });
-  const forceLabel = wasAutoSubmit === 'time' ? 'Изтекло време'
-                   : wasAutoSubmit ? 'Напуснал екрана' : 'не';
-
   const status = document.getElementById('send-status');
-  status.textContent = '⏳ Изпращане на резултати...';
 
   fetch('https://formsubmit.co/ajax/ngnyagolova@gmail.com', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify({
-      _subject: '📝 Тест 2 Модул — ' + studentName + ' — Оценка ' + lastGradeNum,
+      _subject: '📝 Тест 2 Модул — ' + studentName + ' — Оценка ' + grade,
       _template: 'box',
       _captcha: 'false',
       Ученик: studentName,
-      Резултат: lastScore + '/20 — Оценка ' + lastGradeNum,
+      Резултат: correct + '/20 — Оценка ' + grade,
       Дата: now,
-      Принудително: forceLabel,
+      Принудително: forceMsg || 'не',
       Отговори: detailLines
     })
   })
   .then(r => r.json())
   .then(r => {
-    if (r.success === 'true') {
-      status.textContent = '✅ Резултатите са изпратени на учителя.';
-    } else {
-      status.textContent = '⚠️ Грешка: ' + (r.message || 'неизвестна');
-    }
+    status.textContent = r.success === 'true'
+      ? '✅ Резултатите са изпратени на учителя.'
+      : '⚠️ ' + (r.message || 'Грешка при изпращане');
   })
   .catch(err => {
-    status.textContent = '❌ Мрежова грешка — кажете на учителя! (' + err.message + ')';
+    status.textContent = '❌ Мрежова грешка (' + err.message + ')';
   });
 }
 
-// Auto-submit when student leaves the screen
-let quizActive = false;
+/* Блокиране на назад бутон */
+history.pushState(null, '', location.href);
+window.addEventListener('popstate', () => history.pushState(null, '', location.href));
 
-document.addEventListener('visibilitychange', function() {
-  if (quizActive && document.hidden) {
-    quizActive = false;
-    showResults(true);
-  }
+/* Автоматично предаване при напускане на екрана */
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && quizActive) finishQuiz('screen');
+});
+window.addEventListener('pagehide', () => {
+  if (quizActive) finishQuiz('screen');
 });
 
-window.addEventListener('blur', function() {
-  if (quizActive) {
-    quizActive = false;
-    showResults(true);
-  }
+window.addEventListener('load', () => {
+  setTimeout(() => document.getElementById('name-input').focus(), 300);
 });
-
-function restartQuiz() {
-  current = 0;
-  userAnswers = new Array(questions.length).fill(-1);
-  studentName = '';
-
-  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-  current = 0;
-  secondsLeft = 20 * 60;
-  shuffledQuestions = [];
-  userAnswers = [];
-  studentName = '';
-  quizActive = false;
-  document.getElementById('result-screen').classList.remove('show');
-  document.getElementById('quiz-main').style.display = 'none';
-  document.getElementById('quiz-main').innerHTML = '';
-  document.getElementById('name-input').value = '';
-  document.getElementById('header-sub').textContent = '20 въпроса с избор';
-  document.getElementById('start-screen').style.display = '';
-  document.getElementById('progress-bar').style.width = '0%';
-  document.getElementById('progress-text').textContent = '';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
 </script>
 </body>
 </html>
